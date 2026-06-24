@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Дистанція доставки vs Fees — Bolt</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --primary: #34D186;
+    --dark: #1A1A2E;
+    --bg: #F8F9FA;
+    --card: #ffffff;
+    --border: #e7e9ee;
+    --muted: #6b7280;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    background: var(--dark);
+    color: #fff;
+    padding: 28px 32px;
+  }
+  header h1 { margin: 0 0 6px; font-size: 24px; }
+  header .meta { color: #b9bdca; font-size: 13px; line-height: 1.6; }
+  header .meta b { color: var(--primary); }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 24px 32px 64px; }
+  h2 { font-size: 18px; margin: 36px 0 14px; }
+  .sub { color: var(--muted); font-size: 13px; margin: -8px 0 16px; }
+
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: 22px; }
+  @media (max-width: 1000px) { .kpis { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .kpi .label { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .kpi .value { font-size: 22px; font-weight: 700; }
+  .kpi.accent { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary) inset; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 18px 8px;
+    margin-top: 18px;
+  }
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+  .chart-box { position: relative; height: 340px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--card); }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; margin-top: 14px; }
+  th, td { padding: 10px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--border); }
+  th:first-child, td:first-child { text-align: left; }
+  th { background: var(--dark); color: #fff; font-weight: 600; position: sticky; top: 0; cursor: pointer; user-select: none; }
+  th.nosort { cursor: default; }
+  tbody tr:hover { background: #f3fbf6; }
+  tfoot td, tr.total td { font-weight: 700; background: #eef7f1; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #eef0f4; font-size: 12px; }
+  .muted { color: var(--muted); }
+  footer { color: var(--muted); font-size: 12px; padding: 24px 32px; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Дистанція доставки vs Fees / Courier Cost</h1>
+  <div class="meta" id="meta"></div>
+</header>
+
+<div class="wrap">
+  <div class="kpis" id="kpis"></div>
+
+  <h2>Дистанція vs вартість — по партнерах</h2>
+  <div class="sub">Середня та медіанна дистанція маршруту магазин → клієнт, у км. Fees та Courier Cost — у € на замовлення.</div>
+  <div class="card chart-grid">
+    <div class="chart-box"><canvas id="distByPartner"></canvas></div>
+    <div class="chart-box"><canvas id="scatterPartner"></canvas></div>
+  </div>
+
+  <h2>По партнерах</h2>
+  <div class="table-wrap"><table id="tblPartner"></table></div>
+
+  <h2>По містах</h2>
+  <div class="table-wrap"><table id="tblCity"></table></div>
+
+  <h2>Місто × Партнер</h2>
+  <div class="sub">Деталізація по кожній парі місто-партнер. Клік по заголовку — сортування.</div>
+  <div class="table-wrap"><table id="tblPivot"></table></div>
+</div>
+
+<footer id="footer"></footer>
+
+<script>
+const REPORT_DATA = {"generated_at": "2026-06-24 14:30 UTC", "period_start": "2026-05-01", "period_end": "2026-06-24", "partners": ["ANRI-PHARM", "HOP HEY", "BEER MARKET", "KOPIYKA", "TAISTRA", "CAFE RYNOK", "VARUS"], "distance_metric": "courier_distance_from_provider_to_eater_meters (фактичний маршрут магазин → клієнт)", "by_city_partner": [{"partner": "VARUS", "city": "Kyiv", "orders": 5259, "avg_distance_km": 2.7141739874500854, "median_distance_km": 2.056, "delivery_fee_per_order": 1.1554060782896503, "eater_fees_per_order": 2.2781575204628917, "courier_cost_per_order": 2.30544806807378}, {"partner": "VARUS", "city": "Dnipro", "orders": 3842, "avg_distance_km": 1.6172235814679854, "median_distance_km": 1.255, "delivery_fee_per_order": 0.4170623284606255, "eater_fees_per_order": 1.3061975069280463, "courier_cost_per_order": 1.83180416866216}, {"partner": "KOPIYKA", "city": "Odesa", "orders": 3669, "avg_distance_km": 1.66775769964568, "median_distance_km": 1.19, "delivery_fee_per_order": 0.8089650041776852, "eater_fees_per_order": 1.5743586915947512, "courier_cost_per_order": 1.8709829681112}, {"partner": "HOP HEY", "city": "Kyiv", "orders": 3152, "avg_distance_km": 1.666752855329949, "median_distance_km": 1.232, "delivery_fee_per_order": 0.7816030441936666, "eater_fees_per_order": 1.723092412718531, "courier_cost_per_order": 2.04479010469543}, {"partner": "BEER MARKET", "city": "Kyiv", "orders": 2617, "avg_distance_km": 1.9426415743217424, "median_distance_km": 1.475, "delivery_fee_per_order": 0.8577151370611668, "eater_fees_per_order": 1.760083365878084, "courier_cost_per_order": 2.18206823118074}, {"partner": "CAFE RYNOK", "city": "Lviv", "orders": 2472, "avg_distance_km": 1.740243932038835, "median_distance_km": 1.433, "delivery_fee_per_order": 0.5271021951229926, "eater_fees_per_order": 1.388718004867418, "courier_cost_per_order": 1.8336604368932}, {"partner": "HOP HEY", "city": "Dnipro", "orders": 2365, "avg_distance_km": 1.2061450317124736, "median_distance_km": 0.984, "delivery_fee_per_order": 0.3015459830047947, "eater_fees_per_order": 0.9820824426531579, "courier_cost_per_order": 1.98753159577167}, {"partner": "TAISTRA", "city": "Chernivtsi", "orders": 1202, "avg_distance_km": 2.3939400998336104, "median_distance_km": 2.136, "delivery_fee_per_order": 0.5877163935908682, "eater_fees_per_order": 1.3180568857306114, "courier_cost_per_order": 2.34546157570715}, {"partner": "VARUS", "city": "Kryvyi Rih", "orders": 894, "avg_distance_km": 2.3726208053691273, "median_distance_km": 2.025, "delivery_fee_per_order": 0.6027330893987052, "eater_fees_per_order": 1.1951322342015904, "courier_cost_per_order": 2.12623996420582}, {"partner": "BEER MARKET", "city": "Vinnytsia", "orders": 750, "avg_distance_km": 1.8573826666666666, "median_distance_km": 1.53, "delivery_fee_per_order": 0.6363475193477849, "eater_fees_per_order": 1.3822278932205323, "courier_cost_per_order": 1.97590221733333}, {"partner": "VARUS", "city": "Zaporizhia", "orders": 708, "avg_distance_km": 3.297337570621469, "median_distance_km": 2.538, "delivery_fee_per_order": 0.7634940581478016, "eater_fees_per_order": 1.446599838954817, "courier_cost_per_order": 2.59389068220339}, {"partner": "BEER MARKET", "city": "Lviv", "orders": 656, "avg_distance_km": 2.507614329268293, "median_distance_km": 1.955, "delivery_fee_per_order": 0.6900613261902286, "eater_fees_per_order": 1.4095104692324185, "courier_cost_per_order": 2.15903205945122}, {"partner": "ANRI-PHARM", "city": "Kyiv", "orders": 410, "avg_distance_km": 3.5403341463414635, "median_distance_km": 3.143, "delivery_fee_per_order": 1.213512112317617, "eater_fees_per_order": 2.1295233880244293, "courier_cost_per_order": 2.69077446097561}, {"partner": "VARUS", "city": "Odesa", "orders": 370, "avg_distance_km": 2.779105405405405, "median_distance_km": 2.408, "delivery_fee_per_order": 1.0272143084526202, "eater_fees_per_order": 1.7710358335811343, "courier_cost_per_order": 2.17158161621622}, {"partner": "BEER MARKET", "city": "Odesa", "orders": 297, "avg_distance_km": 1.8991515151515153, "median_distance_km": 1.655, "delivery_fee_per_order": 0.8534227259479554, "eater_fees_per_order": 1.4990209965416317, "courier_cost_per_order": 1.85921491582492}, {"partner": "VARUS", "city": "Irpin", "orders": 292, "avg_distance_km": 3.006044520547945, "median_distance_km": 2.92, "delivery_fee_per_order": 0.8864011511693278, "eater_fees_per_order": 1.4932057507839414, "courier_cost_per_order": 2.66086476712329}, {"partner": "TAISTRA", "city": "Ivano-Frankivsk", "orders": 283, "avg_distance_km": 2.702713780918728, "median_distance_km": 1.706, "delivery_fee_per_order": 0.7054938026003891, "eater_fees_per_order": 1.7305196748557474, "courier_cost_per_order": 2.24480863250883}, {"partner": "VARUS", "city": "Brovary", "orders": 269, "avg_distance_km": 2.2184200743494427, "median_distance_km": 1.915, "delivery_fee_per_order": 0.5685436164087267, "eater_fees_per_order": 1.1981899865540686, "courier_cost_per_order": 2.00608246096654}, {"partner": "TAISTRA", "city": "Khmelnytskyi", "orders": 245, "avg_distance_km": 2.3596897959183676, "median_distance_km": 2.199, "delivery_fee_per_order": 0.6189746321822963, "eater_fees_per_order": 1.3020481751186634, "courier_cost_per_order": 2.08890504489796}, {"partner": "BEER MARKET", "city": "Ivano-Frankivsk", "orders": 241, "avg_distance_km": 1.936149377593361, "median_distance_km": 1.636, "delivery_fee_per_order": 0.5584179685757674, "eater_fees_per_order": 1.1885461919387645, "courier_cost_per_order": 2.02161865560166}, {"partner": "BEER MARKET", "city": "Chernihiv", "orders": 188, "avg_distance_km": 1.7686808510638299, "median_distance_km": 1.464, "delivery_fee_per_order": 0.514158931025686, "eater_fees_per_order": 0.9670523723893604, "courier_cost_per_order": 2.18305675531915}, {"partner": "BEER MARKET", "city": "Poltava", "orders": 186, "avg_distance_km": 2.1440537634408603, "median_distance_km": 1.732, "delivery_fee_per_order": 0.5413013588229918, "eater_fees_per_order": 1.073140505185265, "courier_cost_per_order": 2.07832586021505}, {"partner": "HOP HEY", "city": "Cherkasy", "orders": 162, "avg_distance_km": 2.7344876543209877, "median_distance_km": 2.515, "delivery_fee_per_order": 0.8213451476190287, "eater_fees_per_order": 1.3899755732201657, "courier_cost_per_order": 2.08489808024691}, {"partner": "HOP HEY", "city": "Boryspil", "orders": 134, "avg_distance_km": 1.4466567164179105, "median_distance_km": 1.113, "delivery_fee_per_order": 0.3763860885591494, "eater_fees_per_order": 0.947542145285404, "courier_cost_per_order": 2.18074321641791}, {"partner": "VARUS", "city": "Pavlohrad", "orders": 111, "avg_distance_km": 2.6683783783783785, "median_distance_km": 1.889, "delivery_fee_per_order": 0.7978567221074241, "eater_fees_per_order": 1.1682640315822, "courier_cost_per_order": 2.15071209009009}, {"partner": "BEER MARKET", "city": "Sumy", "orders": 104, "avg_distance_km": 2.0105673076923076, "median_distance_km": 1.523, "delivery_fee_per_order": 0.48102903995080043, "eater_fees_per_order": 1.0686661375352842, "courier_cost_per_order": 2.22799230769231}, {"partner": "BEER MARKET", "city": "Brovary", "orders": 100, "avg_distance_km": 2.15741, "median_distance_km": 1.593, "delivery_fee_per_order": 0.5266941268045747, "eater_fees_per_order": 1.0865061711340178, "courier_cost_per_order": 2.05029972}, {"partner": "HOP HEY", "city": "Brovary", "orders": 99, "avg_distance_km": 2.289040404040404, "median_distance_km": 2.038, "delivery_fee_per_order": 0.5723594401820349, "eater_fees_per_order": 1.1502478301860184, "courier_cost_per_order": 2.3414508989899}, {"partner": "BEER MARKET", "city": "Boryspil", "orders": 90, "avg_distance_km": 1.7698222222222224, "median_distance_km": 1.8, "delivery_fee_per_order": 0.441362063528577, "eater_fees_per_order": 0.9956516923238198, "courier_cost_per_order": 2.23170952222222}, {"partner": "KOPIYKA", "city": "Mykolaiv", "orders": 90, "avg_distance_km": 4.906422222222222, "median_distance_km": 4.728, "delivery_fee_per_order": 1.1810850057989202, "eater_fees_per_order": 1.8492628489118577, "courier_cost_per_order": 3.57118705555556}, {"partner": "BEER MARKET", "city": "Zhytomyr", "orders": 84, "avg_distance_km": 2.889202380952381, "median_distance_km": 2.482, "delivery_fee_per_order": 0.6330433556878162, "eater_fees_per_order": 1.2853473527166583, "courier_cost_per_order": 2.01911357142857}, {"partner": "BEER MARKET", "city": "Bila Tserkva", "orders": 83, "avg_distance_km": 2.348, "median_distance_km": 1.779, "delivery_fee_per_order": 0.6002141152333188, "eater_fees_per_order": 1.0697702168648957, "courier_cost_per_order": 2.16685344578313}, {"partner": "BEER MARKET", "city": "Khmelnytskyi", "orders": 76, "avg_distance_km": 2.6761447368421054, "median_distance_km": 2.478, "delivery_fee_per_order": 0.6548355194888832, "eater_fees_per_order": 1.1637781086234558, "courier_cost_per_order": 2.30300128947368}, {"partner": "HOP HEY", "city": "Irpin", "orders": 72, "avg_distance_km": 3.0161805555555556, "median_distance_km": 2.78, "delivery_fee_per_order": 0.8696602609949672, "eater_fees_per_order": 1.4046248114669524, "courier_cost_per_order": 2.89793836111111}, {"partner": "ANRI-PHARM", "city": "Lviv", "orders": 72, "avg_distance_km": 5.245013888888889, "median_distance_km": 5.05, "delivery_fee_per_order": 1.2746661445445817, "eater_fees_per_order": 2.05307474540402, "courier_cost_per_order": 2.93315388888889}, {"partner": "TAISTRA", "city": "Ternopil", "orders": 60, "avg_distance_km": 3.0563333333333333, "median_distance_km": 2.718, "delivery_fee_per_order": 0.7272554502138189, "eater_fees_per_order": 1.6322744783754806, "courier_cost_per_order": 2.19957905}, {"partner": "BEER MARKET", "city": "Ternopil", "orders": 58, "avg_distance_km": 2.719551724137931, "median_distance_km": 2.027, "delivery_fee_per_order": 0.6453888571360014, "eater_fees_per_order": 1.2325800156559197, "courier_cost_per_order": 2.11519568965517}, {"partner": "HOP HEY", "city": "Bila Tserkva", "orders": 55, "avg_distance_km": 3.536345454545455, "median_distance_km": 3.692, "delivery_fee_per_order": 0.8194035818250998, "eater_fees_per_order": 1.4027149973441904, "courier_cost_per_order": 2.49589616363636}, {"partner": "VARUS", "city": "Kamianske", "orders": 27, "avg_distance_km": 2.4105185185185185, "median_distance_km": 2.125, "delivery_fee_per_order": 0.5971958745299736, "eater_fees_per_order": 1.245836701089651, "courier_cost_per_order": 2.35317377777778}, {"partner": "HOP HEY", "city": "Kamianske", "orders": 27, "avg_distance_km": 1.449888888888889, "median_distance_km": 1.042, "delivery_fee_per_order": 0.46336070600543194, "eater_fees_per_order": 0.8907483638421119, "courier_cost_per_order": 2.16365585185185}, {"partner": "VARUS", "city": "Vyshhorod", "orders": 20, "avg_distance_km": 3.1064000000000003, "median_distance_km": 2.072, "delivery_fee_per_order": 0.8881017169216013, "eater_fees_per_order": 1.4915291975242193, "courier_cost_per_order": 2.8896907}, {"partner": "BEER MARKET", "city": "Irpin", "orders": 10, "avg_distance_km": 3.2503, "median_distance_km": 3.672, "delivery_fee_per_order": 0.9891031580817213, "eater_fees_per_order": 1.4412245055844362, "courier_cost_per_order": 3.5545072}], "by_partner": [{"partner": "VARUS", "orders": 11792, "avg_distance_km": 2.3633856004070557, "median_distance_km": 1.829, "delivery_fee_per_order": 0.8202439186694032, "eater_fees_per_order": 1.7553120803519875, "courier_cost_per_order": 2.15227515069539}, {"partner": "HOP HEY", "orders": 6066, "avg_distance_km": 1.5529843389383449, "median_distance_km": 1.171, "delivery_fee_per_order": 0.5831057953046772, "eater_fees_per_order": 1.3884216954146296, "courier_cost_per_order": 2.04612791163864}, {"partner": "BEER MARKET", "orders": 5540, "avg_distance_km": 2.0395696750902528, "median_distance_km": 1.591, "delivery_fee_per_order": 0.7405187927362501, "eater_fees_per_order": 1.5092087509047023, "courier_cost_per_order": 2.12371992527076}, {"partner": "KOPIYKA", "orders": 3759, "avg_distance_km": 1.7452995477520616, "median_distance_km": 1.203, "delivery_fee_per_order": 0.8178745014232054, "eater_fees_per_order": 1.5809405948026627, "courier_cost_per_order": 1.91169016892791}, {"partner": "CAFE RYNOK", "orders": 2472, "avg_distance_km": 1.740243932038835, "median_distance_km": 1.433, "delivery_fee_per_order": 0.5271021951229927, "eater_fees_per_order": 1.388718004867418, "courier_cost_per_order": 1.8336604368932}, {"partner": "TAISTRA", "orders": 1790, "avg_distance_km": 2.460272625698324, "median_distance_km": 2.142, "delivery_fee_per_order": 0.615292716832193, "eater_fees_per_order": 1.3916087800217722, "courier_cost_per_order": 2.28954309273743}, {"partner": "ANRI-PHARM", "orders": 482, "avg_distance_km": 3.79497510373444, "median_distance_km": 3.433, "delivery_fee_per_order": 1.2226471544760016, "eater_fees_per_order": 2.118103673774078, "courier_cost_per_order": 2.72698051659751}], "by_city": [{"city": "Kyiv", "orders": 11438, "avg_distance_km": 2.2786217870257035, "median_distance_km": 1.663, "delivery_fee_per_order": 0.9863677077079037, "eater_fees_per_order": 2.0013341880220423, "courier_cost_per_order": 2.2192008996328}, {"city": "Dnipro", "orders": 6207, "avg_distance_km": 1.460593845658128, "median_distance_km": 1.129, "delivery_fee_per_order": 0.3730481256246275, "eater_fees_per_order": 1.1827027224894908, "courier_cost_per_order": 1.89113965522797}, {"city": "Odesa", "orders": 4336, "avg_distance_km": 1.7784409594095942, "median_distance_km": 1.315, "delivery_fee_per_order": 0.8306338662504473, "eater_fees_per_order": 1.585981211683355, "courier_cost_per_order": 1.8958276148524}, {"city": "Lviv", "orders": 3200, "avg_distance_km": 1.9764121875, "median_distance_km": 1.551, "delivery_fee_per_order": 0.5773290058537618, "eater_fees_per_order": 1.4079284867243167, "courier_cost_per_order": 1.9251002221875}, {"city": "Chernivtsi", "orders": 1202, "avg_distance_km": 2.3939400998336104, "median_distance_km": 2.136, "delivery_fee_per_order": 0.5877163935908681, "eater_fees_per_order": 1.318056885730611, "courier_cost_per_order": 2.34546157570715}, {"city": "Kryvyi Rih", "orders": 894, "avg_distance_km": 2.3726208053691273, "median_distance_km": 2.025, "delivery_fee_per_order": 0.6027330893987051, "eater_fees_per_order": 1.1951322342015904, "courier_cost_per_order": 2.12623996420582}, {"city": "Vinnytsia", "orders": 750, "avg_distance_km": 1.8573826666666666, "median_distance_km": 1.53, "delivery_fee_per_order": 0.6363475193477847, "eater_fees_per_order": 1.382227893220532, "courier_cost_per_order": 1.97590221733333}, {"city": "Zaporizhia", "orders": 708, "avg_distance_km": 3.297337570621469, "median_distance_km": 2.538, "delivery_fee_per_order": 0.7634940581478015, "eater_fees_per_order": 1.4465998389548171, "courier_cost_per_order": 2.59389068220339}, {"city": "Ivano-Frankivsk", "orders": 524, "avg_distance_km": 2.3501526717557253, "median_distance_km": 1.673, "delivery_fee_per_order": 0.6378501461119658, "eater_fees_per_order": 1.4812532447355318, "courier_cost_per_order": 2.14215828053435}, {"city": "Brovary", "orders": 468, "avg_distance_km": 2.2203226495726494, "median_distance_km": 1.9, "delivery_fee_per_order": 0.5604086112658683, "eater_fees_per_order": 1.1641843134291925, "courier_cost_per_order": 2.08647391666667}, {"city": "Irpin", "orders": 374, "avg_distance_km": 3.0145267379679144, "median_distance_km": 2.92, "delivery_fee_per_order": 0.8859243489676433, "eater_fees_per_order": 1.4747628628619673, "courier_cost_per_order": 2.73039878609626}, {"city": "Khmelnytskyi", "orders": 321, "avg_distance_km": 2.4346137071651093, "median_distance_km": 2.2, "delivery_fee_per_order": 0.6274650603296504, "eater_fees_per_order": 1.2693113369453433, "courier_cost_per_order": 2.13959449844237}, {"city": "Boryspil", "orders": 224, "avg_distance_km": 1.5765, "median_distance_km": 1.176, "delivery_fee_per_order": 0.4024925070736516, "eater_fees_per_order": 0.9668718740061959, "courier_cost_per_order": 2.20122075}, {"city": "Chernihiv", "orders": 188, "avg_distance_km": 1.7686808510638299, "median_distance_km": 1.464, "delivery_fee_per_order": 0.514158931025686, "eater_fees_per_order": 0.9670523723893604, "courier_cost_per_order": 2.18305675531915}, {"city": "Poltava", "orders": 186, "avg_distance_km": 2.1440537634408603, "median_distance_km": 1.732, "delivery_fee_per_order": 0.5413013588229919, "eater_fees_per_order": 1.073140505185265, "courier_cost_per_order": 2.07832586021505}, {"city": "Cherkasy", "orders": 162, "avg_distance_km": 2.7344876543209877, "median_distance_km": 2.515, "delivery_fee_per_order": 0.8213451476190288, "eater_fees_per_order": 1.3899755732201657, "courier_cost_per_order": 2.08489808024691}, {"city": "Bila Tserkva", "orders": 138, "avg_distance_km": 2.8216159420289855, "median_distance_km": 2.151, "delivery_fee_per_order": 0.6875722359764199, "eater_fees_per_order": 1.2024656003892527, "courier_cost_per_order": 2.29799365942029}, {"city": "Ternopil", "orders": 118, "avg_distance_km": 2.8907966101694913, "median_distance_km": 2.425, "delivery_fee_per_order": 0.6870159383620105, "eater_fees_per_order": 1.4358144882251875, "courier_cost_per_order": 2.15810248305085}, {"city": "Pavlohrad", "orders": 111, "avg_distance_km": 2.6683783783783785, "median_distance_km": 1.889, "delivery_fee_per_order": 0.797856722107424, "eater_fees_per_order": 1.1682640315822, "courier_cost_per_order": 2.15071209009009}, {"city": "Sumy", "orders": 104, "avg_distance_km": 2.0105673076923076, "median_distance_km": 1.523, "delivery_fee_per_order": 0.48102903995080043, "eater_fees_per_order": 1.068666137535284, "courier_cost_per_order": 2.22799230769231}, {"city": "Mykolaiv", "orders": 90, "avg_distance_km": 4.906422222222222, "median_distance_km": 4.728, "delivery_fee_per_order": 1.1810850057989202, "eater_fees_per_order": 1.8492628489118579, "courier_cost_per_order": 3.57118705555556}, {"city": "Zhytomyr", "orders": 84, "avg_distance_km": 2.889202380952381, "median_distance_km": 2.482, "delivery_fee_per_order": 0.6330433556878162, "eater_fees_per_order": 1.2853473527166583, "courier_cost_per_order": 2.01911357142857}, {"city": "Kamianske", "orders": 54, "avg_distance_km": 1.9302037037037036, "median_distance_km": 1.701, "delivery_fee_per_order": 0.5302782902677027, "eater_fees_per_order": 1.0682925324658812, "courier_cost_per_order": 2.25841481481481}, {"city": "Vyshhorod", "orders": 20, "avg_distance_km": 3.1064000000000003, "median_distance_km": 2.072, "delivery_fee_per_order": 0.8881017169216016, "eater_fees_per_order": 1.491529197524219, "courier_cost_per_order": 2.8896907}], "total": {"orders": 31901, "avg_distance_km": 2.059001034450331, "median_distance_km": 1.561, "delivery_fee_per_order": 0.7328919759194847, "eater_fees_per_order": 1.5789283980690692, "courier_cost_per_order": 2.0904795324598}};
+
+(function () {
+  const D = REPORT_DATA;
+  const C = { primary: '#34D186', dark: '#1A1A2E', muted: '#6b7280', blue: '#6366F1', amber: '#F59E0B' };
+
+  const num = (v) => (v === null || v === undefined || isNaN(v)) ? null : Number(v);
+  const fmtInt = (v) => num(v) === null ? '—' : Math.round(v).toLocaleString('uk-UA');
+  const fmtKm = (v) => num(v) === null ? '—' : v.toFixed(2) + ' км';
+  const fmtEur = (v) => num(v) === null ? '—' : '€' + v.toFixed(2);
+
+  // ---- meta ----
+  document.getElementById('meta').innerHTML =
+    'Період: <b>' + D.period_start + '</b> → <b>' + D.period_end + '</b> &nbsp;•&nbsp; ' +
+    'Партнери: <b>' + D.partners.join(', ') + '</b><br>' +
+    'Тільки доставлені замовлення (order_state = delivered), country = ua. ' +
+    'Дистанція: фактичний маршрут кур’єра магазин → клієнт.<br>' +
+    'Згенеровано: ' + D.generated_at;
+
+  document.getElementById('footer').innerHTML =
+    'Bolt • Distance vs Fees report • дистанція: ' + D.distance_metric + '<br>' +
+    'Delivery Fee / Order = delivery_price_before_discount. ' +
+    'Eater Fees / Order = delivery + small order fee + service fee. ' +
+    'Courier Cost / Order = базовий заробіток + бонуси + чайові + компенсація очікування − утримання.';
+
+  // ---- KPIs ----
+  const t = D.total || {};
+  const kpis = [
+    { label: 'Замовлень (з дистанцією)', value: fmtInt(t.orders), accent: false },
+    { label: 'Сер. дистанція', value: fmtKm(num(t.avg_distance_km)), accent: true },
+    { label: 'Медіанна дистанція', value: fmtKm(num(t.median_distance_km)), accent: true },
+    { label: 'Delivery Fee / Order', value: fmtEur(num(t.delivery_fee_per_order)), accent: false },
+    { label: 'Eater Fees / Order', value: fmtEur(num(t.eater_fees_per_order)), accent: false },
+    { label: 'Courier Cost / Order', value: fmtEur(num(t.courier_cost_per_order)), accent: false },
+  ];
+  document.getElementById('kpis').innerHTML = kpis.map(k =>
+    '<div class="kpi' + (k.accent ? ' accent' : '') + '"><div class="label">' + k.label +
+    '</div><div class="value">' + k.value + '</div></div>').join('');
+
+  // ---- tables ----
+  const COLS = [
+    { key: 'orders', label: 'Замовлень', fmt: fmtInt },
+    { key: 'avg_distance_km', label: 'Сер. дистанція', fmt: fmtKm },
+    { key: 'median_distance_km', label: 'Медіана дистанції', fmt: fmtKm },
+    { key: 'delivery_fee_per_order', label: 'Delivery Fee / Order', fmt: fmtEur },
+    { key: 'eater_fees_per_order', label: 'Eater Fees / Order', fmt: fmtEur },
+    { key: 'courier_cost_per_order', label: 'Courier Cost / Order', fmt: fmtEur },
+  ];
+
+  function buildTable(tableId, dimCols, rows, totalRow) {
+    const allCols = dimCols.concat(COLS);
+    const state = { key: COLS[0].key, dir: -1 };
+    const table = document.getElementById(tableId);
+
+    function render() {
+      const sorted = rows.slice().sort((a, b) => {
+        const av = a[state.key], bv = b[state.key];
+        if (typeof av === 'string') return state.dir * av.localeCompare(bv, 'uk');
+        return state.dir * ((num(av) ?? -Infinity) - (num(bv) ?? -Infinity));
+      });
+      let html = '<thead><tr>';
+      allCols.forEach(c => {
+        const arrow = state.key === c.key ? (state.dir === 1 ? ' ▲' : ' ▼') : '';
+        html += '<th data-key="' + c.key + '">' + c.label + arrow + '</th>';
+      });
+      html += '</tr></thead><tbody>';
+      sorted.forEach(r => {
+        html += '<tr>';
+        allCols.forEach(c => { html += '<td>' + (c.fmt ? c.fmt(r[c.key]) : (r[c.key] ?? '—')) + '</td>'; });
+        html += '</tr>';
+      });
+      html += '</tbody>';
+      if (totalRow) {
+        html += '<tfoot><tr class="total">';
+        allCols.forEach((c, i) => {
+          if (i === 0) html += '<td>Разом</td>';
+          else if (i < dimCols.length) html += '<td></td>';
+          else html += '<td>' + (c.fmt ? c.fmt(totalRow[c.key]) : (totalRow[c.key] ?? '—')) + '</td>';
+        });
+        html += '</tr></tfoot>';
+      }
+      table.innerHTML = html;
+      table.querySelectorAll('th[data-key]').forEach(th => {
+        th.addEventListener('click', () => {
+          const k = th.getAttribute('data-key');
+          if (state.key === k) state.dir *= -1; else { state.key = k; state.dir = -1; }
+          render();
+        });
+      });
+    }
+    render();
+  }
+
+  buildTable('tblPartner', [{ key: 'partner', label: 'Партнер' }], D.by_partner, D.total);
+  buildTable('tblCity', [{ key: 'city', label: 'Місто' }], D.by_city, D.total);
+  buildTable('tblPivot',
+    [{ key: 'partner', label: 'Партнер' }, { key: 'city', label: 'Місто' }],
+    D.by_city_partner, D.total);
+
+  // ---- charts ----
+  const partners = D.by_partner.slice().sort((a, b) => b.orders - a.orders);
+  const labels = partners.map(p => p.partner);
+
+  new Chart(document.getElementById('distByPartner'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Сер. дистанція, км', data: partners.map(p => num(p.avg_distance_km)), backgroundColor: C.primary },
+        { label: 'Медіана, км', data: partners.map(p => num(p.median_distance_km)), backgroundColor: C.dark },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { title: { display: true, text: 'Дистанція доставки по партнерах, км' } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: 'км' } } },
+    },
+  });
+
+  const palette = [C.primary, C.dark, C.blue, C.amber, '#EC4899', '#10B981', '#8B5CF6'];
+  new Chart(document.getElementById('scatterPartner'), {
+    type: 'bubble',
+    data: {
+      datasets: partners.map((p, i) => ({
+        label: p.partner,
+        data: [{
+          x: num(p.median_distance_km),
+          y: num(p.courier_cost_per_order),
+          r: Math.max(5, Math.sqrt(p.orders) / 12),
+        }],
+        backgroundColor: palette[i % palette.length] + 'cc',
+        borderColor: palette[i % palette.length],
+      })),
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        title: { display: true, text: 'Медіанна дистанція vs Courier Cost / Order (розмір = к-сть замовлень)' },
+        tooltip: { callbacks: { label: (c) => c.dataset.label + ': ' + c.parsed.x.toFixed(2) + ' км, €' + c.parsed.y.toFixed(2) } },
+      },
+      scales: {
+        x: { title: { display: true, text: 'Медіанна дистанція, км' }, beginAtZero: true },
+        y: { title: { display: true, text: 'Courier Cost / Order, €' }, beginAtZero: true },
+      },
+    },
+  });
+})();
+</script>
+</body>
+</html>
