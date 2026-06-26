@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VARUS × Bolt — Покриття та GMV по містах</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --primary:#34D186; --primary-dark:#28a86c; --dark:#1A1A2E; --bg:#F8F9FA;
+    --card:#ffffff; --muted:#6b7280; --border:#e5e7eb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+       background:var(--bg);color:var(--dark);line-height:1.5;padding:0 0 60px}
+  header{background:var(--dark);color:#fff;padding:32px 24px}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+  header .wrap{padding:0 0}
+  h1{font-size:26px;font-weight:700;letter-spacing:-.3px}
+  header p{color:#b9c0cc;margin-top:8px;font-size:14px}
+  .badge{display:inline-block;background:var(--primary);color:#06281a;font-weight:700;
+         border-radius:999px;padding:4px 12px;font-size:12px;margin-top:14px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:28px 0}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;
+        box-shadow:0 1px 2px rgba(16,24,40,.04)}
+  .card .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+  .card .value{font-size:28px;font-weight:700;margin-top:6px}
+  .card .value span{font-size:15px;color:var(--muted);font-weight:500}
+  section{margin-top:36px}
+  h2{font-size:18px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  h2::before{content:"";width:8px;height:20px;background:var(--primary);border-radius:3px;display:inline-block}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+  .btn{background:var(--primary);color:#06281a;border:none;border-radius:10px;padding:11px 18px;
+       font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
+  .btn:hover{background:var(--primary-dark);color:#fff}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);
+        border-radius:14px;overflow:hidden}
+  th,td{padding:12px 14px;text-align:right;font-size:14px;border-bottom:1px solid var(--border)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{background:#f1f3f5;color:var(--dark);font-weight:700;font-size:12px;text-transform:uppercase;
+           letter-spacing:.3px;cursor:pointer;user-select:none;white-space:nowrap}
+  thead th:hover{color:var(--primary-dark)}
+  tbody tr:hover{background:#fafdfb}
+  tbody tr:last-child td{border-bottom:none}
+  tfoot td{font-weight:700;background:#f1f3f5;border-top:2px solid var(--primary)}
+  .bar{height:8px;border-radius:6px;background:#e9ecef;position:relative;overflow:hidden;min-width:60px}
+  .bar>span{position:absolute;left:0;top:0;bottom:0;background:var(--primary);border-radius:6px}
+  .covcell{display:flex;align-items:center;gap:10px;justify-content:flex-end}
+  .covcell b{min-width:48px;display:inline-block}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .chartbox{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+  .chartbox h3{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:12px}
+  footer{margin-top:40px;color:var(--muted);font-size:12px;line-height:1.7}
+  footer code{background:#eef0f2;padding:1px 6px;border-radius:5px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>VARUS × Bolt Food — покриття мережі та GMV по містах</h1>
+    <p>Радіус покриття магазинами VARUS полігонів доставки Bolt (6&nbsp;км по&nbsp;повітрю) · GMV за 2&nbsp;квартал 2026 (EUR)</p>
+    <span class="badge" id="gen-badge">Підготовка до публічного запуску</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="cards" id="summary"></div>
+
+  <section>
+    <div class="toolbar">
+      <h2>Деталізація по містах</h2>
+      <button class="btn" onclick="downloadCSV()">⬇ Завантажити CSV</button>
+    </div>
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th data-k="city" data-t="s">Місто</th>
+          <th data-k="stores" data-t="n">Активних<br>сторів</th>
+          <th data-k="coverage_pct" data-t="n">Покриття<br>полігону&nbsp;Bolt</th>
+          <th data-k="gmv_eur" data-t="n">GMV, EUR<br>(Q2&nbsp;2026)</th>
+          <th data-k="gmv_share" data-t="n">% від&nbsp;GMV<br>партнера</th>
+          <th data-k="orders" data-t="n">Замовлень</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot></tfoot>
+    </table>
+  </section>
+
+  <section class="grid2">
+    <div class="chartbox">
+      <h3>GMV по містах, EUR (Q2 2026)</h3>
+      <canvas id="gmvChart" height="240"></canvas>
+    </div>
+    <div class="chartbox">
+      <h3>Покриття полігонів Bolt магазинами VARUS, %</h3>
+      <canvas id="covChart" height="240"></canvas>
+    </div>
+  </section>
+
+  <footer>
+    <p><b>Методологія покриття.</b> Для кожного міста будується об'єднання кругів радіусом 6&nbsp;км
+    (по&nbsp;повітрю) навколо активних магазинів VARUS. Покриття&nbsp;=&nbsp;площа полігону доставки Bolt,
+    що потрапляє в&nbsp;цю зону, поділена на&nbsp;повну площу полігону. Геометрія проєктується в&nbsp;локальну
+    метричну систему навколо центроїда зони. Об'єднаний полігон Bucha+Irpin+Brovary+Vyshhorod розбито
+    на&nbsp;окремі зони й&nbsp;віднесено до&nbsp;найближчого міста VARUS.</p>
+    <p style="margin-top:8px"><b>Дані.</b> Активні стори&nbsp;— <code>dim_provider_v2</code>
+    (<code>group_name='VARUS'</code>, <code>provider_status='active'</code>). GMV&nbsp;—
+    <code>fact_order_delivery</code>, <code>order_state='delivered'</code>, <code>order_created_date</code>
+    у&nbsp;межах 2026-04-01…2026-06-30, <code>country_code='ua'</code>. % рахується від&nbsp;сукупного GMV
+    VARUS за&nbsp;період. Полігони Bolt&nbsp;— KML з&nbsp;Bolt polygons.</p>
+    <p id="gen-line" style="margin-top:8px"></p>
+  </footer>
+</div>
+
+<script>
+const TOTAL_GMV_EUR = 155515.66;
+const DATA = [
+  {city:"Kyiv",       ua:"Київ",        stores:17, coverage_pct:83.5,  gmv_eur:73129.18, orders:5464},
+  {city:"Dnipro",     ua:"Дніпро",      stores:16, coverage_pct:100.0, gmv_eur:49807.47, orders:4003},
+  {city:"Kryvyi Rih", ua:"Кривий Ріг",  stores:8,  coverage_pct:100.0, gmv_eur:10033.36, orders:919},
+  {city:"Zaporizhia", ua:"Запоріжжя",   stores:4,  coverage_pct:94.1,  gmv_eur:8895.42,  orders:760},
+  {city:"Odesa",      ua:"Одеса",       stores:5,  coverage_pct:94.2,  gmv_eur:4737.28,  orders:380},
+  {city:"Irpin",      ua:"Ірпінь",      stores:1,  coverage_pct:68.5,  gmv_eur:3758.27,  orders:302},
+  {city:"Brovary",    ua:"Бровари",     stores:1,  coverage_pct:100.0, gmv_eur:3174.34,  orders:283},
+  {city:"Pavlohrad",  ua:"Павлоград",   stores:2,  coverage_pct:100.0, gmv_eur:1269.75,  orders:119},
+  {city:"Vyshhorod",  ua:"Вишгород",    stores:1,  coverage_pct:84.0,  gmv_eur:356.86,   orders:22},
+  {city:"Kamianske",  ua:"Кам'янське",  stores:2,  coverage_pct:88.2,  gmv_eur:353.73,   orders:28},
+];
+DATA.forEach(d => d.gmv_share = d.gmv_eur / TOTAL_GMV_EUR * 100);
+
+const GENERATED_AT = "2026-06-26 08:46 UTC";
+document.getElementById("gen-line").textContent = "Згенеровано: " + GENERATED_AT;
+
+const fmtEur = v => "€" + v.toLocaleString("uk-UA",{maximumFractionDigits:0});
+const fmtPct = v => v.toLocaleString("uk-UA",{minimumFractionDigits:1,maximumFractionDigits:1}) + "%";
+const fmtNum = v => v.toLocaleString("uk-UA");
+
+// summary cards
+const totalStores = DATA.reduce((s,d)=>s+d.stores,0);
+const totalOrders = DATA.reduce((s,d)=>s+d.orders,0);
+const wCov = DATA.reduce((s,d)=>s+d.coverage_pct*d.stores,0)/totalStores;
+const cards = [
+  {label:"Міст присутності", value:DATA.length},
+  {label:"Активних сторів", value:totalStores},
+  {label:"GMV Q2 2026", value:fmtEur(TOTAL_GMV_EUR)},
+  {label:"Замовлень Q2 2026", value:fmtNum(totalOrders)},
+  {label:"Сер. покриття (зваж.)", value:fmtPct(wCov)},
+];
+document.getElementById("summary").innerHTML = cards.map(c=>
+  `<div class="card"><div class="label">${c.label}</div><div class="value">${c.value}</div></div>`).join("");
+
+// table
+let sortKey="gmv_eur", sortDir=-1;
+function renderTable(){
+  const rows=[...DATA].sort((a,b)=>{
+    let x=a[sortKey],y=b[sortKey];
+    if(sortKey==="city"){x=a.ua;y=b.ua;return sortDir*x.localeCompare(y,"uk");}
+    return sortDir*(x-y);
+  });
+  const tb=document.querySelector("#tbl tbody");
+  tb.innerHTML=rows.map(d=>`
+    <tr>
+      <td>${d.ua} <span style="color:var(--muted);font-size:12px">${d.city}</span></td>
+      <td>${d.stores}</td>
+      <td><div class="covcell"><div class="bar" style="flex:1"><span style="width:${d.coverage_pct}%"></span></div><b>${fmtPct(d.coverage_pct)}</b></div></td>
+      <td>${fmtEur(d.gmv_eur)}</td>
+      <td>${fmtPct(d.gmv_share)}</td>
+      <td>${fmtNum(d.orders)}</td>
+    </tr>`).join("");
+  document.querySelector("#tbl tfoot").innerHTML=`
+    <tr><td>Разом</td><td>${totalStores}</td><td style="text-align:right">${fmtPct(wCov)}</td>
+    <td>${fmtEur(TOTAL_GMV_EUR)}</td><td>100.0%</td><td>${fmtNum(totalOrders)}</td></tr>`;
+}
+document.querySelectorAll("#tbl thead th").forEach(th=>{
+  th.addEventListener("click",()=>{
+    const k=th.dataset.k;
+    if(sortKey===k) sortDir*=-1; else {sortKey=k; sortDir = th.dataset.t==="s"?1:-1;}
+    renderTable();
+  });
+});
+renderTable();
+
+// CSV
+function downloadCSV(){
+  const header=["City","City_UA","Active_stores","Coverage_pct","GMV_EUR_Q2_2026","GMV_share_of_partner_pct","Orders_Q2_2026"];
+  const lines=[header.join(",")];
+  [...DATA].sort((a,b)=>b.gmv_eur-a.gmv_eur).forEach(d=>{
+    lines.push([d.city,d.ua,d.stores,d.coverage_pct,d.gmv_eur.toFixed(2),d.gmv_share.toFixed(2),d.orders].join(","));
+  });
+  lines.push(["TOTAL","Разом",totalStores,wCov.toFixed(1),TOTAL_GMV_EUR.toFixed(2),"100.00",totalOrders].join(","));
+  const blob=new Blob(["\uFEFF"+lines.join("\n")],{type:"text/csv;charset=utf-8;"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="varus_bolt_coverage_gmv_q2_2026.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// charts
+const byGmv=[...DATA].sort((a,b)=>b.gmv_eur-a.gmv_eur);
+new Chart(document.getElementById("gmvChart"),{
+  type:"bar",
+  data:{labels:byGmv.map(d=>d.ua),
+    datasets:[{data:byGmv.map(d=>Math.round(d.gmv_eur)),backgroundColor:"#34D186",borderRadius:6}]},
+  options:{indexAxis:"y",plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:c=>"€"+c.parsed.x.toLocaleString("uk-UA")}}},
+    scales:{x:{ticks:{callback:v=>"€"+(v/1000)+"k"}}}}
+});
+const byCov=[...DATA].sort((a,b)=>b.coverage_pct-a.coverage_pct);
+new Chart(document.getElementById("covChart"),{
+  type:"bar",
+  data:{labels:byCov.map(d=>d.ua),
+    datasets:[{data:byCov.map(d=>d.coverage_pct),backgroundColor:"#1A1A2E",borderRadius:6}]},
+  options:{indexAxis:"y",plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:c=>c.parsed.x.toFixed(1)+"%"}}},
+    scales:{x:{max:100,ticks:{callback:v=>v+"%"}}}}
+});
+</script>
+</body>
+</html>
