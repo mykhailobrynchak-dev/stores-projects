@@ -11,8 +11,8 @@
   у співставленні з Delivery Fee / Order, Eater Fees / Order та Courier Cost per order.
   Згруповано по містах і партнерах.
 
-- **[VARUS × Bolt — Покриття мережі та GMV по містах](https://mykhailobrynchak-dev.github.io/stores-projects/varus-coverage.html)**
-  Підготовка до публічного запуску VARUS: міста присутності та к-сть активних сторів,
-  % покриття полігонів доставки Bolt магазинами VARUS (радіус 6 км по повітрю),
-  а також GMV по містах за 2 квартал 2026 (EUR) у грошовому та відсотковому виразі.
-  З можливістю завантажити дані у CSV.
+- **[VARUS × Bolt — Network Coverage & GMV by City](https://mykhailobrynchak-dev.github.io/stores-projects/varus-coverage.html)**
+  VARUS public launch prep: cities of presence with active store counts,
+  % coverage of Bolt delivery polygons by VARUS stores (6 km as the crow flies),
+  and GMV by city for Q2 2026 (EUR) in absolute and percentage terms.
+  Includes a CSV download button.

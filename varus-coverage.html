@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VARUS × Bolt — Покриття та GMV по містах</title>
+<title>VARUS × Bolt — Coverage & GMV by City</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root{
@@ -58,9 +58,9 @@
 <body>
 <header>
   <div class="wrap">
-    <h1>VARUS × Bolt Food — покриття мережі та GMV по містах</h1>
-    <p>Радіус покриття магазинами VARUS полігонів доставки Bolt (6&nbsp;км по&nbsp;повітрю) · GMV за 2&nbsp;квартал 2026 (EUR)</p>
-    <span class="badge" id="gen-badge">Підготовка до публічного запуску</span>
+    <h1>VARUS × Bolt Food — Network Coverage & GMV by City</h1>
+    <p>Coverage radius of Bolt delivery polygons by VARUS stores (6&nbsp;km as the crow flies) · GMV for Q2&nbsp;2026 (EUR)</p>
+    <span class="badge" id="gen-badge">Public launch preparation</span>
   </div>
 </header>
 
@@ -69,18 +69,18 @@
 
   <section>
     <div class="toolbar">
-      <h2>Деталізація по містах</h2>
-      <button class="btn" onclick="downloadCSV()">⬇ Завантажити CSV</button>
+      <h2>City breakdown</h2>
+      <button class="btn" onclick="downloadCSV()">⬇ Download CSV</button>
     </div>
     <table id="tbl">
       <thead>
         <tr>
-          <th data-k="city" data-t="s">Місто</th>
-          <th data-k="stores" data-t="n">Активних<br>сторів</th>
-          <th data-k="coverage_pct" data-t="n">Покриття<br>полігону&nbsp;Bolt</th>
+          <th data-k="city" data-t="s">City</th>
+          <th data-k="stores" data-t="n">Active<br>stores</th>
+          <th data-k="coverage_pct" data-t="n">Bolt&nbsp;polygon<br>coverage</th>
           <th data-k="gmv_eur" data-t="n">GMV, EUR<br>(Q2&nbsp;2026)</th>
-          <th data-k="gmv_share" data-t="n">% від&nbsp;GMV<br>партнера</th>
-          <th data-k="orders" data-t="n">Замовлень</th>
+          <th data-k="gmv_share" data-t="n">% of&nbsp;partner<br>GMV</th>
+          <th data-k="orders" data-t="n">Orders</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -90,26 +90,26 @@
 
   <section class="grid2">
     <div class="chartbox">
-      <h3>GMV по містах, EUR (Q2 2026)</h3>
+      <h3>GMV by city, EUR (Q2 2026)</h3>
       <canvas id="gmvChart" height="240"></canvas>
     </div>
     <div class="chartbox">
-      <h3>Покриття полігонів Bolt магазинами VARUS, %</h3>
+      <h3>Bolt polygon coverage by VARUS stores, %</h3>
       <canvas id="covChart" height="240"></canvas>
     </div>
   </section>
 
   <footer>
-    <p><b>Методологія покриття.</b> Для кожного міста будується об'єднання кругів радіусом 6&nbsp;км
-    (по&nbsp;повітрю) навколо активних магазинів VARUS. Покриття&nbsp;=&nbsp;площа полігону доставки Bolt,
-    що потрапляє в&nbsp;цю зону, поділена на&nbsp;повну площу полігону. Геометрія проєктується в&nbsp;локальну
-    метричну систему навколо центроїда зони. Об'єднаний полігон Bucha+Irpin+Brovary+Vyshhorod розбито
-    на&nbsp;окремі зони й&nbsp;віднесено до&nbsp;найближчого міста VARUS.</p>
-    <p style="margin-top:8px"><b>Дані.</b> Активні стори&nbsp;— <code>dim_provider_v2</code>
+    <p><b>Coverage methodology.</b> For each city, a union of 6&nbsp;km circles (straight-line / as the
+    crow flies) is built around the active VARUS stores. Coverage&nbsp;=&nbsp;the area of the Bolt delivery
+    polygon that falls inside this zone, divided by the polygon's total area. Geometry is projected into a
+    local metric system around the zone centroid. The combined Bucha+Irpin+Brovary+Vyshhorod polygon is
+    split into separate zones and assigned to the nearest VARUS city.</p>
+    <p style="margin-top:8px"><b>Data.</b> Active stores&nbsp;— <code>dim_provider_v2</code>
     (<code>group_name='VARUS'</code>, <code>provider_status='active'</code>). GMV&nbsp;—
     <code>fact_order_delivery</code>, <code>order_state='delivered'</code>, <code>order_created_date</code>
-    у&nbsp;межах 2026-04-01…2026-06-30, <code>country_code='ua'</code>. % рахується від&nbsp;сукупного GMV
-    VARUS за&nbsp;період. Полігони Bolt&nbsp;— KML з&nbsp;Bolt polygons.</p>
+    between 2026-04-01 and 2026-06-30, <code>country_code='ua'</code>. The % is calculated against the total
+    VARUS GMV for the period. Bolt polygons&nbsp;— KML files from Bolt polygons.</p>
     <p id="gen-line" style="margin-top:8px"></p>
   </footer>
 </div>
@@ -117,36 +117,37 @@
 <script>
 const TOTAL_GMV_EUR = 155515.66;
 const DATA = [
-  {city:"Kyiv",       ua:"Київ",        stores:17, coverage_pct:83.5,  gmv_eur:73129.18, orders:5464},
-  {city:"Dnipro",     ua:"Дніпро",      stores:16, coverage_pct:100.0, gmv_eur:49807.47, orders:4003},
-  {city:"Kryvyi Rih", ua:"Кривий Ріг",  stores:8,  coverage_pct:100.0, gmv_eur:10033.36, orders:919},
-  {city:"Zaporizhia", ua:"Запоріжжя",   stores:4,  coverage_pct:94.1,  gmv_eur:8895.42,  orders:760},
-  {city:"Odesa",      ua:"Одеса",       stores:5,  coverage_pct:94.2,  gmv_eur:4737.28,  orders:380},
-  {city:"Irpin",      ua:"Ірпінь",      stores:1,  coverage_pct:68.5,  gmv_eur:3758.27,  orders:302},
-  {city:"Brovary",    ua:"Бровари",     stores:1,  coverage_pct:100.0, gmv_eur:3174.34,  orders:283},
-  {city:"Pavlohrad",  ua:"Павлоград",   stores:2,  coverage_pct:100.0, gmv_eur:1269.75,  orders:119},
-  {city:"Vyshhorod",  ua:"Вишгород",    stores:1,  coverage_pct:84.0,  gmv_eur:356.86,   orders:22},
-  {city:"Kamianske",  ua:"Кам'янське",  stores:2,  coverage_pct:88.2,  gmv_eur:353.73,   orders:28},
+  {city:"Kyiv",       stores:17, coverage_pct:83.5,  gmv_eur:73129.18, orders:5464},
+  {city:"Dnipro",     stores:16, coverage_pct:100.0, gmv_eur:49807.47, orders:4003},
+  {city:"Kryvyi Rih", stores:8,  coverage_pct:100.0, gmv_eur:10033.36, orders:919},
+  {city:"Zaporizhia", stores:4,  coverage_pct:94.1,  gmv_eur:8895.42,  orders:760},
+  {city:"Odesa",      stores:5,  coverage_pct:94.2,  gmv_eur:4737.28,  orders:380},
+  {city:"Irpin",      stores:1,  coverage_pct:68.5,  gmv_eur:3758.27,  orders:302},
+  {city:"Brovary",    stores:1,  coverage_pct:100.0, gmv_eur:3174.34,  orders:283},
+  {city:"Pavlohrad",  stores:2,  coverage_pct:100.0, gmv_eur:1269.75,  orders:119},
+  {city:"Vyshhorod",  stores:1,  coverage_pct:84.0,  gmv_eur:356.86,   orders:22},
+  {city:"Kamianske",  stores:2,  coverage_pct:88.2,  gmv_eur:353.73,   orders:28},
 ];
 DATA.forEach(d => d.gmv_share = d.gmv_eur / TOTAL_GMV_EUR * 100);
 
 const GENERATED_AT = "2026-06-26 08:46 UTC";
-document.getElementById("gen-line").textContent = "Згенеровано: " + GENERATED_AT;
+document.getElementById("gen-line").textContent = "Generated: " + GENERATED_AT;
 
-const fmtEur = v => "€" + v.toLocaleString("uk-UA",{maximumFractionDigits:0});
-const fmtPct = v => v.toLocaleString("uk-UA",{minimumFractionDigits:1,maximumFractionDigits:1}) + "%";
-const fmtNum = v => v.toLocaleString("uk-UA");
+const LOC = "en-US";
+const fmtEur = v => "€" + v.toLocaleString(LOC,{maximumFractionDigits:0});
+const fmtPct = v => v.toLocaleString(LOC,{minimumFractionDigits:1,maximumFractionDigits:1}) + "%";
+const fmtNum = v => v.toLocaleString(LOC);
 
 // summary cards
 const totalStores = DATA.reduce((s,d)=>s+d.stores,0);
 const totalOrders = DATA.reduce((s,d)=>s+d.orders,0);
 const wCov = DATA.reduce((s,d)=>s+d.coverage_pct*d.stores,0)/totalStores;
 const cards = [
-  {label:"Міст присутності", value:DATA.length},
-  {label:"Активних сторів", value:totalStores},
+  {label:"Cities of presence", value:DATA.length},
+  {label:"Active stores", value:totalStores},
   {label:"GMV Q2 2026", value:fmtEur(TOTAL_GMV_EUR)},
-  {label:"Замовлень Q2 2026", value:fmtNum(totalOrders)},
-  {label:"Сер. покриття (зваж.)", value:fmtPct(wCov)},
+  {label:"Orders Q2 2026", value:fmtNum(totalOrders)},
+  {label:"Avg. coverage (weighted)", value:fmtPct(wCov)},
 ];
 document.getElementById("summary").innerHTML = cards.map(c=>
   `<div class="card"><div class="label">${c.label}</div><div class="value">${c.value}</div></div>`).join("");
@@ -156,13 +157,13 @@ let sortKey="gmv_eur", sortDir=-1;
 function renderTable(){
   const rows=[...DATA].sort((a,b)=>{
     let x=a[sortKey],y=b[sortKey];
-    if(sortKey==="city"){x=a.ua;y=b.ua;return sortDir*x.localeCompare(y,"uk");}
+    if(sortKey==="city"){return sortDir*a.city.localeCompare(b.city,"en");}
     return sortDir*(x-y);
   });
   const tb=document.querySelector("#tbl tbody");
   tb.innerHTML=rows.map(d=>`
     <tr>
-      <td>${d.ua} <span style="color:var(--muted);font-size:12px">${d.city}</span></td>
+      <td>${d.city}</td>
       <td>${d.stores}</td>
       <td><div class="covcell"><div class="bar" style="flex:1"><span style="width:${d.coverage_pct}%"></span></div><b>${fmtPct(d.coverage_pct)}</b></div></td>
       <td>${fmtEur(d.gmv_eur)}</td>
@@ -170,7 +171,7 @@ function renderTable(){
       <td>${fmtNum(d.orders)}</td>
     </tr>`).join("");
   document.querySelector("#tbl tfoot").innerHTML=`
-    <tr><td>Разом</td><td>${totalStores}</td><td style="text-align:right">${fmtPct(wCov)}</td>
+    <tr><td>Total</td><td>${totalStores}</td><td style="text-align:right">${fmtPct(wCov)}</td>
     <td>${fmtEur(TOTAL_GMV_EUR)}</td><td>100.0%</td><td>${fmtNum(totalOrders)}</td></tr>`;
 }
 document.querySelectorAll("#tbl thead th").forEach(th=>{
@@ -184,12 +185,12 @@ renderTable();
 
 // CSV
 function downloadCSV(){
-  const header=["City","City_UA","Active_stores","Coverage_pct","GMV_EUR_Q2_2026","GMV_share_of_partner_pct","Orders_Q2_2026"];
+  const header=["City","Active_stores","Coverage_pct","GMV_EUR_Q2_2026","GMV_share_of_partner_pct","Orders_Q2_2026"];
   const lines=[header.join(",")];
   [...DATA].sort((a,b)=>b.gmv_eur-a.gmv_eur).forEach(d=>{
-    lines.push([d.city,d.ua,d.stores,d.coverage_pct,d.gmv_eur.toFixed(2),d.gmv_share.toFixed(2),d.orders].join(","));
+    lines.push([d.city,d.stores,d.coverage_pct,d.gmv_eur.toFixed(2),d.gmv_share.toFixed(2),d.orders].join(","));
   });
-  lines.push(["TOTAL","Разом",totalStores,wCov.toFixed(1),TOTAL_GMV_EUR.toFixed(2),"100.00",totalOrders].join(","));
+  lines.push(["TOTAL",totalStores,wCov.toFixed(1),TOTAL_GMV_EUR.toFixed(2),"100.00",totalOrders].join(","));
   const blob=new Blob(["\uFEFF"+lines.join("\n")],{type:"text/csv;charset=utf-8;"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
@@ -202,16 +203,16 @@ function downloadCSV(){
 const byGmv=[...DATA].sort((a,b)=>b.gmv_eur-a.gmv_eur);
 new Chart(document.getElementById("gmvChart"),{
   type:"bar",
-  data:{labels:byGmv.map(d=>d.ua),
+  data:{labels:byGmv.map(d=>d.city),
     datasets:[{data:byGmv.map(d=>Math.round(d.gmv_eur)),backgroundColor:"#34D186",borderRadius:6}]},
   options:{indexAxis:"y",plugins:{legend:{display:false},
-    tooltip:{callbacks:{label:c=>"€"+c.parsed.x.toLocaleString("uk-UA")}}},
+    tooltip:{callbacks:{label:c=>"€"+c.parsed.x.toLocaleString("en-US")}}},
     scales:{x:{ticks:{callback:v=>"€"+(v/1000)+"k"}}}}
 });
 const byCov=[...DATA].sort((a,b)=>b.coverage_pct-a.coverage_pct);
 new Chart(document.getElementById("covChart"),{
   type:"bar",
-  data:{labels:byCov.map(d=>d.ua),
+  data:{labels:byCov.map(d=>d.city),
     datasets:[{data:byCov.map(d=>d.coverage_pct),backgroundColor:"#1A1A2E",borderRadius:6}]},
   options:{indexAxis:"y",plugins:{legend:{display:false},
     tooltip:{callbacks:{label:c=>c.parsed.x.toFixed(1)+"%"}}},
