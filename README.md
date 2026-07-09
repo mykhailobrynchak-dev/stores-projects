@@ -16,3 +16,8 @@
   % coverage of Bolt delivery polygons by VARUS stores (6 km as the crow flies),
   and GMV by city for Q2 2026 (EUR) in absolute and percentage terms.
   Includes a CSV download button.
+
+- **[KOPIYKA — Cannibalization of Customers](https://mykhailobrynchak-dev.github.io/stores-projects/kopiyka-cannibalization.html)**
+  Скільки клієнтів KOPIYKA (KOPIYKA · KOPIYKA MINI · SANTIM) перейшли до замовлень
+  в інших grocery/retail-магазинах Bolt Market: перетин бази, когортний аналіз
+  відтоку/переходу, топ конкурентів (LOKO, VARUS, BEER MARKET) та географія перетину.

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOPIYKA — Канібалізація клієнтів</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#F8F9FA;--card:#fff;--border:#e5e7eb;--text:#1A1A2E;--muted:#6b7280;--green:#34D186;--red:#dc2626;--yellow:#ca8a04;--blue:#2563eb;--purple:#7c3aed;--cyan:#0891b2;--orange:#ea580c;--accent:#34D186;--accent-dark:#1A1A2E}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,system-ui,sans-serif;line-height:1.65}
+.container{max-width:1240px;margin:0 auto;padding:28px}
+.header{display:flex;align-items:center;gap:20px;margin-bottom:28px;padding-bottom:22px;border-bottom:2px solid var(--border)}
+.logo-dot{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#34D186,#1A1A2E);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px}
+h1{font-size:23px;font-weight:700;color:var(--accent-dark)}
+.subtitle{color:var(--muted);font-size:13px;margin-top:2px}
+.report-meta{margin-left:auto;text-align:right;color:var(--muted);font-size:12px}
+h2{font-size:18px;font-weight:700;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);color:var(--accent-dark)}
+h3{font-size:14px;font-weight:600;margin-bottom:10px}
+.section{margin-bottom:34px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.kpi{text-align:center;padding:18px 12px}
+.kpi-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;line-height:1.3}
+.kpi-value{font-size:30px;font-weight:800}
+.kpi-sub{font-size:11px;margin-top:5px;font-weight:600;color:var(--muted)}
+.chart-box{position:relative;height:280px}
+.chart-box-lg{position:relative;height:360px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #f3f4f6;vertical-align:middle}
+tr:hover{background:#f9fafb}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600}
+.insight{border-left:3px solid var(--blue);background:#eff6ff;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:10px;font-size:13px}
+.insight.warn{border-color:var(--orange);background:#fff7ed}
+.insight.good{border-color:var(--green);background:#f0fdf4}
+.insight.action{border-color:var(--purple);background:#f5f3ff}
+.insight-title{font-weight:600;margin-bottom:3px}
+.insight-text{color:var(--muted);font-size:12px}
+.divider{height:1px;background:var(--border);margin:26px 0}
+.verdict{border-radius:10px;padding:18px 20px;color:#fff}
+.verdict h3{color:#fff;font-size:13px;opacity:.9;margin-bottom:6px}
+.verdict .big{font-size:28px;font-weight:800;line-height:1.15}
+.verdict .desc{font-size:12px;opacity:.92;margin-top:6px}
+.rec-prio{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;color:#fff}
+@media(max-width:900px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+@media print{body{background:#fff}.card{box-shadow:none;border:1px solid #ddd}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="logo-dot">KP</div>
+  <div>
+    <h1>KOPIYKA — Канібалізація клієнтів</h1>
+    <div class="subtitle" id="reportSubtitle">Bolt Food UA · Завантаження...</div>
+  </div>
+  <div class="report-meta" id="reportMeta">Завантаження...</div>
+</div>
+
+<div class="insight warn" style="margin-bottom:22px">
+  <div class="insight-title">Головне питання: скільки клієнтів Копійки перейшли до замовлень в інших магазинах?</div>
+  <div class="insight-text">«Інші магазини» = будь-який grocery/retail-партнер Bolt Market (<code>is_bolt_market_order = true</code>), крім групи KOPIYKA. Аналізуємо перетин та відтік клієнтської бази Копійки за <span id="c-window"></span>. Дані: доставлені замовлення, ринок Bolt Food Україна.</div>
+</div>
+
+<!-- VERDICT -->
+<div class="section">
+  <div class="grid-3" id="verdict-cards"></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- OVERVIEW -->
+<div class="section">
+  <h2>1. Огляд перетину бази</h2>
+  <div class="grid-4" id="overview-cards"></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- OVERLAP -->
+<div class="section">
+  <h2>2. Пряма канібалізація — перетин клієнтів</h2>
+  <div class="grid-2">
+    <div class="card"><h3>Клієнти Копійки: скільки замовляють і в конкурентів</h3><div class="chart-box"><canvas id="cOverlap"></canvas></div></div>
+    <div class="card"><h3>Динаміка перетину по місяцях, %</h3><div class="chart-box"><canvas id="cOverlapTrend"></canvas></div></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>Перетин по місяцях</h3>
+    <div style="overflow-x:auto"><table id="overlap-table"></table></div>
+  </div>
+  <div class="insight" style="margin-top:10px">
+    <div class="insight-text"><strong>Перетин</strong> — клієнт Копійки, який у тому ж місяці зробив ≥1 замовлення в конкурента Bolt Market. Зростання частки з місяця в місяць = канібалізація наростає.</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- COHORT SWITCH -->
+<div class="section">
+  <h2>3. Відтік і перехід (когортний аналіз)</h2>
+  <div class="insight" style="margin-bottom:14px">
+    <div class="insight-text">Беремо клієнтів, що замовляли Копійку в <strong>базовому періоді</strong> (<span id="c-base-window"></span>), і дивимось, що з ними сталося у <strong>пізньому періоді</strong> (<span id="c-late-window"></span>): втримались у Копійці, пішли з Копійки, або пішли й почали замовляти в конкурента (<strong>прямий перехід</strong>).</div>
+  </div>
+  <div class="grid-4" id="switch-cards"></div>
+  <div class="card" style="margin-top:14px"><h3>Розподіл базової когорти</h3><div class="chart-box"><canvas id="cSwitch"></canvas></div></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- CONTEXT TREND -->
+<div class="section">
+  <h2>4. Контекст: динаміка Копійки vs перетин</h2>
+  <div class="grid-2">
+    <div class="card"><h3>Замовлення та активні клієнти Копійки</h3><div class="chart-box"><canvas id="cKopTrend"></canvas></div></div>
+    <div class="card"><h3>Клієнти-«двоплатформенники» проти бази Копійки</h3><div class="chart-box"><canvas id="cOverlapAbs"></canvas></div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- TOP COMPETITORS -->
+<div class="section">
+  <h2>5. Куди йдуть клієнти — топ конкурентів</h2>
+  <div class="grid-2">
+    <div class="card"><h3>Спільні клієнти з конкурентами (топ-10)</h3><div class="chart-box-lg"><canvas id="cTopComp"></canvas></div></div>
+    <div class="card">
+      <h3>Деталізація по конкурентах</h3>
+      <div style="overflow-x:auto"><table id="top-table"></table></div>
+    </div>
+  </div>
+  <div class="insight action" style="margin-top:10px">
+    <div class="insight-title">Як читати</div>
+    <div class="insight-text"><strong>Спільні клієнти</strong> — клієнти Копійки, які за період зробили ≥1 замовлення в цього конкурента. Прямі grocery-конкуренти (LOKO, VARUS) відбирають продуктовий кошик; алко-retail (BEER MARKET та ін.) — радше додаткова корзина, ніж заміна.</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- TOP CITIES -->
+<div class="section">
+  <h2>6. Географія перетину — топ міст</h2>
+  <div class="card">
+    <div style="overflow-x:auto"><table id="cities-table"></table></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- CONCLUSIONS -->
+<div class="section">
+  <h2>7. Висновки та рекомендації</h2>
+  <div class="grid-2">
+    <div>
+      <div class="insight good"><div class="insight-title">Що показують дані</div><div class="insight-text" id="concl-facts"></div></div>
+    </div>
+    <div class="card">
+      <h3>Рекомендації</h3>
+      <div style="overflow-x:auto"><table id="rec-table">
+        <thead><tr><th>Пріоритет</th><th>Дія</th></tr></thead>
+        <tbody>
+          <tr><td><span class="rec-prio" style="background:#dc2626">Негайно</span></td><td>Утримання «двоплатформенників»: персональні Bolt+ / знижкові кампанії на топ-SKU для клієнтів, що вже замовляють у LOKO/VARUS.</td></tr>
+          <tr><td><span class="rec-prio" style="background:#ea580c">Цей тиждень</span></td><td>Availability & acceptance у містах з найбільшим перетином — закрити тригери відтоку (out-of-stock, довга доставка).</td></tr>
+          <tr><td><span class="rec-prio" style="background:#ca8a04">Цей місяць</span></td><td>Асортимент і ціна на позиції, де прямі конкуренти виграють; win-back кампанія для когорти, що пішла з Копійки.</td></tr>
+          <tr><td><span class="rec-prio" style="background:#2563eb">Довгостроково</span></td><td>Ростити частку Bolt+ підписників (лояльніша, стабільніша база) та частоту замовлень, щоб зменшити «вимивання» до конкурентів.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;color:var(--muted);font-size:11px;margin-top:36px;padding:20px 0;border-top:1px solid var(--border)">
+  KOPIYKA × Bolt Food UA · Аналіз канібалізації · Конфіденційно
+</div>
+
+</div><!-- end container -->
+
+<script>
+const REPORT_DATA = {"generated_at": "2026-07-08 15:52 UTC", "partner_name": "KOPIYKA", "window_start": "2026-03-01", "window_end": "2026-06-30", "base_end": "2026-05-01", "kopiyka_trend": [{"period": "2026-03", "orders": 2406.0, "gmv_uah": 1468943.24, "active_users": 959.0, "new_users": 96.0}, {"period": "2026-04", "orders": 2090.0, "gmv_uah": 1405882.44, "active_users": 747.0, "new_users": 72.0}, {"period": "2026-05", "orders": 2159.0, "gmv_uah": 1311529.66, "active_users": 802.0, "new_users": 91.0}, {"period": "2026-06", "orders": 2195.0, "gmv_uah": 1381464.43, "active_users": 771.0, "new_users": 85.0}], "overview": {"kopiyka_customers": 2225.0, "competitor_customers_all": 32154.0, "overlap_customers": 458.0}, "switch": {"base_customers": 1393.0, "retained": 457.0, "churned_kopiyka": 936.0, "switched_to_competitor": 63.0}, "monthly_overlap": [{"period": "2026-03", "kopiyka_customers": 959.0, "also_competitor": 77.0}, {"period": "2026-04", "kopiyka_customers": 747.0, "also_competitor": 95.0}, {"period": "2026-05", "kopiyka_customers": 802.0, "also_competitor": 138.0}, {"period": "2026-06", "kopiyka_customers": 771.0, "also_competitor": 138.0}], "top_competitors": [{"competitor": "LOKO", "shared_customers": 205.0, "orders_from_shared": 510.0, "gmv_from_shared_uah": 404239.21}, {"competitor": "VARUS", "shared_customers": 133.0, "orders_from_shared": 305.0, "gmv_from_shared_uah": 212195.25}, {"competitor": "BEER MARKET", "shared_customers": 106.0, "orders_from_shared": 286.0, "gmv_from_shared_uah": 128900.1}, {"competitor": "PYVOTEKA ODESA", "shared_customers": 40.0, "orders_from_shared": 149.0, "gmv_from_shared_uah": 83557.2}, {"competitor": "BOHEMIAN KINGS BEER GROUP", "shared_customers": 26.0, "orders_from_shared": 107.0, "gmv_from_shared_uah": 66502.4}, {"competitor": "PYVKO", "shared_customers": 21.0, "orders_from_shared": 48.0, "gmv_from_shared_uah": 37983.4}, {"competitor": "YEPYVO", "shared_customers": 14.0, "orders_from_shared": 26.0, "gmv_from_shared_uah": 13180.1}, {"competitor": "COFFEE ART PIZZA", "shared_customers": 9.0, "orders_from_shared": 17.0, "gmv_from_shared_uah": 10973.2}, {"competitor": "HOP HEY", "shared_customers": 9.0, "orders_from_shared": 20.0, "gmv_from_shared_uah": 10396.69}, {"competitor": "LEPRUKON", "shared_customers": 7.0, "orders_from_shared": 27.0, "gmv_from_shared_uah": 10230.91}, {"competitor": "NO TABOO", "shared_customers": 4.0, "orders_from_shared": 4.0, "gmv_from_shared_uah": 6264.6}, {"competitor": "RUKAVYCHKA", "shared_customers": 4.0, "orders_from_shared": 23.0, "gmv_from_shared_uah": 12987.48}, {"competitor": "SUSHI VESLA", "shared_customers": 4.0, "orders_from_shared": 8.0, "gmv_from_shared_uah": 6074.32}, {"competitor": "WINETIME", "shared_customers": 2.0, "orders_from_shared": 2.0, "gmv_from_shared_uah": 795.0}, {"competitor": "ANRI-PHARM", "shared_customers": 2.0, "orders_from_shared": 2.0, "gmv_from_shared_uah": 501.44}], "top_cities": [{"city": "Odesa", "shared_customers": 409.0, "orders_from_shared": 1398.0}, {"city": "Kyiv", "shared_customers": 23.0, "orders_from_shared": 58.0}, {"city": "Mykolaiv", "shared_customers": 18.0, "orders_from_shared": 53.0}, {"city": "Dnipro", "shared_customers": 7.0, "orders_from_shared": 11.0}, {"city": "Kharkiv", "shared_customers": 6.0, "orders_from_shared": 19.0}, {"city": "Lviv", "shared_customers": 6.0, "orders_from_shared": 25.0}, {"city": "Vinnytsia", "shared_customers": 3.0, "orders_from_shared": 5.0}, {"city": "Zaporizhia", "shared_customers": 2.0, "orders_from_shared": 3.0}, {"city": "Ivano-Frankivsk", "shared_customers": 1.0, "orders_from_shared": 2.0}, {"city": "Brovary", "shared_customers": 1.0, "orders_from_shared": 1.0}, {"city": "Kropyvnytskyi", "shared_customers": 1.0, "orders_from_shared": 9.0}, {"city": "Irpin", "shared_customers": 1.0, "orders_from_shared": 1.0}]};
+
+const D = REPORT_DATA;
+const n = (v, d=1) => v == null ? '—' : Number(v).toFixed(d);
+const uah = (v) => v == null ? '—' : Number(v).toLocaleString('uk-UA', {maximumFractionDigits:0}) + ' ₴';
+const pct = (v) => v == null ? '—' : n(v,1) + '%';
+const fmt = (v) => v == null ? '—' : Number(v).toLocaleString('uk-UA', {maximumFractionDigits:0});
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function shortMonth(period) {
+  const map = {'01':'Січ','02':'Лют','03':'Бер','04':'Кві','05':'Тра','06':'Чер','07':'Лип','08':'Сер','09':'Вер','10':'Жов','11':'Лис','12':'Гру'};
+  const [y,m] = String(period).slice(0,7).split('-');
+  return (map[m]||m) + ' ' + (y||'').slice(2);
+}
+function prevMonthStr(dateStr){ let [y,m]=String(dateStr).slice(0,7).split('-').map(Number); m-=1; if(m<1){m=12;y--;} return `${y}-${String(m).padStart(2,'0')}`; }
+function win(s,e){ return shortMonth(s) + ' – ' + shortMonth(e); }
+const setTxt=(id,v)=>{const el=document.getElementById(id); if(el) el.textContent=v;};
+
+const defOpts = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#6b7280',font:{size:11}}},tooltip:{backgroundColor:'#fff',borderColor:'#e5e7eb',borderWidth:1,titleColor:'#1f2937',bodyColor:'#6b7280'}},
+  scales:{x:{ticks:{color:'#9ca3af',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}},y:{ticks:{color:'#9ca3af',font:{size:10}},grid:{color:'rgba(0,0,0,0.06)'}}}
+};
+function dualY(l,r){return{...defOpts,scales:{...defOpts.scales,y:{...defOpts.scales.y,title:{display:true,text:l,color:'#9ca3af'}},y1:{...defOpts.scales.y,position:'right',title:{display:true,text:r,color:'#9ca3af'},grid:{drawOnChartArea:false}}}}}
+
+const ov = D.overview || {}, sw = D.switch || {}, mo = D.monthly_overlap || [], tc = D.top_competitors || [], cities = D.top_cities || [], trend = D.kopiyka_trend || [];
+
+// Header
+setTxt('reportSubtitle', `Bolt Food UA · Група KOPIYKA (KOPIYKA · KOPIYKA MINI · SANTIM) · ${win(D.window_start, D.window_end)}`);
+setTxt('reportMeta', `Оновлено: ${D.generated_at}\nВікно: ${D.window_start} — ${D.window_end}`);
+document.getElementById('reportMeta').innerHTML = `Оновлено: ${D.generated_at}<br>Вікно: ${D.window_start} — ${D.window_end}`;
+setTxt('c-window', win(D.window_start, D.window_end));
+setTxt('c-base-window', win(D.window_start, prevMonthStr(D.base_end)));
+setTxt('c-late-window', win(D.base_end, D.window_end));
+
+const overlapPct = ov.kopiyka_customers ? ov.overlap_customers/ov.kopiyka_customers*100 : null;
+const switchPct = sw.base_customers ? sw.switched_to_competitor/sw.base_customers*100 : null;
+const moPctArr = mo.map(d=>d.kopiyka_customers?d.also_competitor/d.kopiyka_customers*100:null).filter(v=>v!=null);
+const overlapFirst = moPctArr.length ? moPctArr[0] : null;
+const overlapLast = moPctArr.length ? moPctArr[moPctArr.length-1] : null;
+const trendUp = (overlapFirst!=null && overlapLast!=null) ? overlapLast > overlapFirst : null;
+
+// Verdict cards
+const verdicts = [
+  {bg:'#1A1A2E', h:'Перетин бази', big: fmt(ov.overlap_customers), desc:`${pct(overlapPct)} клієнтів Копійки за період також замовляли в інших магазинах Bolt Market`},
+  {bg:'#ea580c', h:'Тренд канібалізації', big: trendUp==null?'—':(trendUp?'Зростає':'Стабільний'), desc:`Місячна частка перетину: ${pct(overlapFirst)} → ${pct(overlapLast)}`},
+  {bg:'#dc2626', h:'Прямий перехід (когорта)', big: fmt(sw.switched_to_competitor), desc:`${pct(switchPct)} базової когорти пішли з Копійки та перейшли до конкурента`},
+];
+document.getElementById('verdict-cards').innerHTML = verdicts.map(v =>
+  `<div class="verdict" style="background:${v.bg}"><h3>${v.h}</h3><div class="big">${v.big}</div><div class="desc">${v.desc}</div></div>`).join('');
+
+// Overview cards
+const overviewCards = [
+  {label:'Клієнти Копійки', value:fmt(ov.kopiyka_customers), sub:'унікальні за період', color:'#34D186'},
+  {label:'…також у конкурентів', value:fmt(ov.overlap_customers), sub:pct(overlapPct)+' бази', color:'#ea580c'},
+  {label:'База конкурентів', value:fmt(ov.competitor_customers_all), sub:'клієнти Bolt Market (не KOPIYKA)', color:'#2563eb'},
+  {label:'Прямий перехід', value:fmt(sw.switched_to_competitor), sub:'з когорти '+fmt(sw.base_customers), color:'#dc2626'},
+];
+document.getElementById('overview-cards').innerHTML = overviewCards.map(k =>
+  `<div class="card kpi" style="border-top:3px solid ${k.color}"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.color}">${k.value}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+// Overlap donut
+const onlyKop = (ov.kopiyka_customers||0) - (ov.overlap_customers||0);
+new Chart(document.getElementById('cOverlap'), {type:'doughnut', data:{labels:['Лише Копійка','Копійка + конкуренти'], datasets:[{data:[onlyKop, ov.overlap_customers||0], backgroundColor:['#34D186','#ea580c']}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#6b7280', font:{size:11}}}}}});
+
+// Overlap trend
+const moLabels = mo.map(d=>shortMonth(d.period));
+new Chart(document.getElementById('cOverlapTrend'), {type:'line', data:{labels:moLabels, datasets:[{label:'Частка клієнтів Копійки, що також у конкурентів, %', data:mo.map(d=>d.kopiyka_customers?d.also_competitor/d.kopiyka_customers*100:null), borderColor:'#ea580c', backgroundColor:'rgba(234,88,12,0.08)', fill:true, tension:.3, pointRadius:5}]}, options:defOpts});
+
+// Overlap table
+let ht = '<thead><tr><th>Місяць</th><th>Клієнти Копійки</th><th>Також у конкурентів</th><th>Частка</th></tr></thead><tbody>';
+for (const d of mo) { const p = d.kopiyka_customers ? d.also_competitor/d.kopiyka_customers*100 : null; ht += `<tr><td>${shortMonth(d.period)}</td><td>${fmt(d.kopiyka_customers)}</td><td>${fmt(d.also_competitor)}</td><td><strong>${pct(p)}</strong></td></tr>`; }
+ht += '</tbody>';
+document.getElementById('overlap-table').innerHTML = ht;
+
+// Switch cards
+const base = sw.base_customers || 0;
+const swCards = [
+  {label:'Базова когорта', value:fmt(base), sub:'клієнти базового періоду', color:'#1A1A2E'},
+  {label:'Втримались у Копійці', value:fmt(sw.retained), sub:pct(base?sw.retained/base*100:null), color:'#34D186'},
+  {label:'Пішли з Копійки', value:fmt(sw.churned_kopiyka), sub:pct(base?sw.churned_kopiyka/base*100:null), color:'#dc2626'},
+  {label:'…і перейшли в конкурента', value:fmt(sw.switched_to_competitor), sub:pct(base?sw.switched_to_competitor/base*100:null), color:'#ea580c'},
+];
+document.getElementById('switch-cards').innerHTML = swCards.map(k =>
+  `<div class="card kpi" style="border-top:3px solid ${k.color}"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.color}">${k.value}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+// Switch bar
+const churnedOnly = (sw.churned_kopiyka||0) - (sw.switched_to_competitor||0);
+new Chart(document.getElementById('cSwitch'), {type:'bar', data:{labels:['Базова когорта'], datasets:[
+  {label:'Втримались', data:[sw.retained], backgroundColor:'#34D186'},
+  {label:'Пішли (без конкурента)', data:[churnedOnly], backgroundColor:'#9ca3af'},
+  {label:'Перейшли в конкурента', data:[sw.switched_to_competitor], backgroundColor:'#ea580c'}
+]}, options:{...defOpts, indexAxis:'y', scales:{...defOpts.scales, x:{...defOpts.scales.x, stacked:true}, y:{...defOpts.scales.y, stacked:true}}}});
+
+// Kopiyka trend
+const trLabels = trend.map(d=>shortMonth(d.period));
+new Chart(document.getElementById('cKopTrend'), {type:'bar', data:{labels:trLabels, datasets:[
+  {label:'Замовлення', data:trend.map(d=>d.orders), backgroundColor:'rgba(52,209,134,0.5)', borderRadius:3, yAxisID:'y'},
+  {label:'Активні клієнти', data:trend.map(d=>d.active_users), type:'line', borderColor:'#2563eb', backgroundColor:'transparent', tension:.3, pointRadius:4, yAxisID:'y1'}
+]}, options:dualY('Замовлення','Активні клієнти')});
+
+// Overlap absolute vs base
+new Chart(document.getElementById('cOverlapAbs'), {type:'bar', data:{labels:moLabels, datasets:[
+  {label:'Клієнти Копійки', data:mo.map(d=>d.kopiyka_customers), backgroundColor:'rgba(52,209,134,0.5)', borderRadius:3},
+  {label:'…також у конкурентів', data:mo.map(d=>d.also_competitor), backgroundColor:'#ea580c', borderRadius:3}
+]}, options:defOpts});
+
+// Top competitors
+const tcTop = tc.slice(0, 10);
+new Chart(document.getElementById('cTopComp'), {type:'bar', data:{labels:tcTop.map(d=>d.competitor), datasets:[{label:'Спільні клієнти', data:tcTop.map(d=>d.shared_customers), backgroundColor:'#ea580c', borderRadius:3}]}, options:{...defOpts, indexAxis:'y'}});
+
+let tt = '<thead><tr><th>Конкурент</th><th>Спільні клієнти</th><th>Замовлень</th><th>GMV ₴</th></tr></thead><tbody>';
+for (const d of tc) tt += `<tr><td>${esc(d.competitor)}</td><td><strong>${fmt(d.shared_customers)}</strong></td><td>${fmt(d.orders_from_shared)}</td><td>${uah(d.gmv_from_shared_uah)}</td></tr>`;
+tt += '</tbody>';
+document.getElementById('top-table').innerHTML = tt;
+
+// Cities
+let ct = '<thead><tr><th>Місто</th><th>Спільні клієнти</th><th>Замовлень у конкурентів</th></tr></thead><tbody>';
+for (const d of cities) ct += `<tr><td>${esc(d.city)}</td><td><strong>${fmt(d.shared_customers)}</strong></td><td>${fmt(d.orders_from_shared)}</td></tr>`;
+ct += '</tbody>';
+document.getElementById('cities-table').innerHTML = ct;
+
+// Conclusions
+const topComp = tc.length ? tc.slice(0,3).map(d=>`${esc(d.competitor)} (${fmt(d.shared_customers)})`).join(', ') : '—';
+document.getElementById('concl-facts').innerHTML =
+  `За ${win(D.window_start, D.window_end)} <strong>${fmt(ov.overlap_customers)}</strong> клієнтів Копійки (<strong>${pct(overlapPct)}</strong> бази) також замовляли в інших магазинах Bolt Market. ` +
+  `Місячна частка перетину ${trendUp?'<strong>зростає</strong>':'стабільна'}: ${pct(overlapFirst)} → ${pct(overlapLast)}. ` +
+  `З базової когорти <strong>${fmt(sw.switched_to_competitor)}</strong> клієнтів (${pct(switchPct)}) пішли з Копійки й перейшли до конкурента. ` +
+  `Найбільші перетини: ${topComp}.`;
+</script>
+</body>
+</html>
