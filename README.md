@@ -11,8 +11,9 @@ Compares partner-reported order receipts against Bolt's Provider Price
 
 Tabs:
 
-- **Hop Hey** (01.05–14.06.2026) — matched by the unique 9-digit `order_id`.
-  Sum difference = Hop Hey price − `provider_price_before_discount` (Bolt price shown before and after discount).
+- **Hop Hey** — two periods as sub-tabs: **01.05–14.06** and **01.07–12.07.2026**.
+  Matched by the unique 9-digit `order_id`; Sum difference = Hop Hey price − `provider_price_before_discount`
+  (Bolt price shown before and after discount).
 - **Kopiyka** — two periods as sub-tabs: **01.05–14.06** and **01.06–12.07.2026**.
   Matched by `order_id`; Sum difference = Bolt receipt (after discount) − Kopiyka receipt.
 - **TAISTRA** (01.05–09.07.2026) — the partner registry has no shared order IDs, only
