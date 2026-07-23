@@ -26,15 +26,15 @@ ENDPOINTS = [
 BUFFER_KM = 4.0
 
 
-def load_city_bboxes(stores):
+def load_city_bboxes(stores, buffer_km=BUFFER_KM):
     pts = {}
     for s in stores:
         pts.setdefault(s["city"], []).append((s["lat"], s["lon"]))
     boxes = {}
     for city, ps in pts.items():
         lats = [p[0] for p in ps]; lons = [p[1] for p in ps]
-        dlat = BUFFER_KM / 111.0
-        dlon = BUFFER_KM / (111.0 * math.cos(math.radians(sum(lats) / len(lats))))
+        dlat = buffer_km / 111.0
+        dlon = buffer_km / (111.0 * math.cos(math.radians(sum(lats) / len(lats))))
         boxes[city] = (min(lats) - dlat, min(lons) - dlon,
                        max(lats) + dlat, max(lons) + dlon)
     return boxes
@@ -86,7 +86,11 @@ def polygons_from(js):
 def main():
     net_dir = Path(sys.argv[1]).resolve()
     stores = json.loads((net_dir / "stores.json").read_text(encoding="utf-8"))
-    boxes = load_city_bboxes(stores)
+    params = json.loads((net_dir / "params.json").read_text(encoding="utf-8")) \
+        if (net_dir / "params.json").exists() else {}
+    buffer_km = params.get("resid_buffer_km", BUFFER_KM)
+    boxes = load_city_bboxes(stores, buffer_km)
+    print(f"(residential bbox buffer = {buffer_km} km)")
     for city, bbox in boxes.items():
         fn = net_dir / f"residential_{city}.json"
         if fn.exists() and fn.stat().st_size > 2:

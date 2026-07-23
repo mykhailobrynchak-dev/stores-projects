@@ -1,0 +1,7 @@
+{
+ "service_max_km": 6.0,
+ "rmax": 6.0,
+ "ps_rmax": 6.0,
+ "buffer_km": 6.5,
+ "resid_buffer_km": 7.0
+}

@@ -26,6 +26,10 @@ CITY_ECON = ECON["cities"]
 COUNTRY_CPO = ECON.get("country_cpo", 2.0)
 COUNTRY_DROPOFF = ECON.get("country_dropoff", 2.6)
 
+# Optional per-network overrides (e.g. allow radii up to 6 km for a network).
+PARAMS = json.loads((NET_DIR / "params.json").read_text(encoding="utf-8")) \
+    if (NET_DIR / "params.json").exists() else {}
+
 DEFAULT_CPO_SLOPE = 0.2654  # EUR per km of drop-off (FORA-derived fallback)
 
 # ---------------------------------------------------------------------------
@@ -77,14 +81,15 @@ def load_stores():
 # Geometry + demand grid.
 # ---------------------------------------------------------------------------
 CELL_KM = 0.20
-BUFFER_KM = 4.0
-RMIN, RMAX, RSTEP = 1.0, 5.0, 0.1
+BUFFER_KM = PARAMS.get("buffer_km", 4.0)
+RMIN, RSTEP = 1.0, 0.1
+RMAX = PARAMS.get("rmax", 5.0)
 ALPHA_CANNIB = 0.35
 BETA_CPO = 0.40
 KDE_SIGMA = 1.2
 RESID_DILATE_KM = 0.3
-SERVICE_MAX_KM = 3.0
-PS_RMIN, PS_RMAX = 1.3, 3.5
+SERVICE_MAX_KM = PARAMS.get("service_max_km", 3.0)
+PS_RMIN, PS_RMAX = 1.3, PARAMS.get("ps_rmax", 3.5)
 PS_ALPHA = 0.18
 PS_BETA = 0.25
 SMOOTH_SIGMA_KM = 1.0
