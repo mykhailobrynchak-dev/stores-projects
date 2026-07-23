@@ -1,12 +1,23 @@
 [
  {
+  "name": "ОʼНДЕ вул. Південно-Кільцева",
+  "city": "Chernivtsi",
+  "address": "вул. Південно-Кільцева 14Е, м. Чернівці",
+  "lat": 48.25202,
+  "lon": 25.95755,
+  "provider_id": 164306,
+  "status": "deleted",
+  "group_name": "TAISTRA"
+ },
+ {
   "name": "Тайстра вул. Білоруська",
   "city": "Chernivtsi",
   "address": "вул. Білоруська 21, м. Чернівці",
   "lat": 48.298366,
   "lon": 25.949936,
   "provider_id": 164283,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Воробкевича, 1А",
@@ -15,7 +26,8 @@
   "lat": 48.26069,
   "lon": 25.94271,
   "provider_id": 892761,
-  "status": "onboarding"
+  "status": "onboarding",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Героїв Майдану, 226А",
@@ -24,7 +36,8 @@
   "lat": 48.264158,
   "lon": 25.926303,
   "provider_id": 153567,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Героїв Майдану, 7",
@@ -33,7 +46,8 @@
   "lat": 48.28493,
   "lon": 25.93336,
   "provider_id": 199390,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Руська, 219",
@@ -42,7 +56,8 @@
   "lat": 48.28066,
   "lon": 25.97932,
   "provider_id": 175229,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Трепка, 2",
@@ -51,7 +66,8 @@
   "lat": 48.277994,
   "lon": 25.942847,
   "provider_id": 892762,
-  "status": "onboarding"
+  "status": "onboarding",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Фастівська 35А",
@@ -60,7 +76,18 @@
   "lat": 48.287933,
   "lon": 25.975324,
   "provider_id": 262812,
-  "status": "onboarding"
+  "status": "onboarding",
+  "group_name": "TAISTRA"
+ },
+ {
+  "name": "Тайстра вул. Ярослава Мудрого",
+  "city": "Chernivtsi",
+  "address": "вул. Ярослава Мудрого 200, м. Чернівці",
+  "lat": 48.29831,
+  "lon": 25.93974,
+  "provider_id": 164280,
+  "status": "deleted",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Незалежності",
@@ -69,7 +96,8 @@
   "lat": 48.915811,
   "lon": 24.735339,
   "provider_id": 164329,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Пасічна, 2",
@@ -78,7 +106,8 @@
   "lat": 48.941674,
   "lon": 24.694842,
   "provider_id": 175689,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Целевича, 20",
@@ -87,7 +116,8 @@
   "lat": 48.94379,
   "lon": 24.70422,
   "provider_id": 164331,
-  "status": "hidden"
+  "status": "hidden",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Целевича, 34",
@@ -96,7 +126,8 @@
   "lat": 48.94377,
   "lon": 24.70422,
   "provider_id": 174008,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Інститутська",
@@ -105,7 +136,18 @@
   "lat": 49.40975,
   "lon": 26.96012,
   "provider_id": 164334,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
+ },
+ {
+  "name": "Тайстра вул. Героїв АТО, 19/1",
+  "city": "Khmelnytskyi",
+  "address": "м. Хмельницький, вул. Героїв АТО, 19/1",
+  "lat": 49.39514,
+  "lon": 27.052,
+  "provider_id": 185488,
+  "status": "deleted",
+  "group_name": null
  },
  {
   "name": "Тайстра вул. Соборна",
@@ -114,7 +156,8 @@
   "lat": 49.423476,
   "lon": 26.980979,
   "provider_id": 198369,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Трудова, 11",
@@ -123,7 +166,8 @@
   "lat": 49.41129,
   "lon": 27.01519,
   "provider_id": 193395,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра просп. Миру",
@@ -132,7 +176,58 @@
   "lat": 49.437078,
   "lon": 27.007212,
   "provider_id": 164337,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
+ },
+ {
+  "name": "Тайстра бул. І. Газюка, 3",
+  "city": "Lutsk",
+  "address": "Луцьк, бул. Івана Газюка, 3",
+  "lat": 50.717621,
+  "lon": 25.310179,
+  "provider_id": 592669,
+  "status": "active",
+  "group_name": null
+ },
+ {
+  "name": "Тайстра вул. Ветеранів, 1А",
+  "city": "Lutsk",
+  "address": "Луцьк, вул. Ветеранів, 1А",
+  "lat": 50.759108,
+  "lon": 25.376006,
+  "provider_id": 532658,
+  "status": "onboarding",
+  "group_name": null
+ },
+ {
+  "name": "Тайстра вул. Конякіна, 14",
+  "city": "Lutsk",
+  "address": "Луцьк,  вул. Конякіна, 14",
+  "lat": 50.77448,
+  "lon": 25.361551,
+  "provider_id": 742668,
+  "status": "onboarding",
+  "group_name": null
+ },
+ {
+  "name": "Тайстра пр. Грушевського, 20",
+  "city": "Lutsk",
+  "address": "Луцьк, пр. Грушевського, 20",
+  "lat": 50.756544,
+  "lon": 25.344888,
+  "provider_id": 742667,
+  "status": "onboarding",
+  "group_name": null
+ },
+ {
+  "name": "Тайстра пр. Соборності, 22",
+  "city": "Lutsk",
+  "address": "Луцьк, просп. Соборності, 22",
+  "lat": 50.762765,
+  "lon": 25.365237,
+  "provider_id": 412660,
+  "status": "onboarding",
+  "group_name": null
  },
  {
   "name": "Тайстра вул. Грушевського",
@@ -141,7 +236,8 @@
   "lat": 49.553519,
   "lon": 25.594079,
   "provider_id": 164340,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
  },
  {
   "name": "Тайстра вул. Степана Бандери",
@@ -150,6 +246,7 @@
   "lat": 49.549645,
   "lon": 25.622479,
   "provider_id": 198370,
-  "status": "active"
+  "status": "active",
+  "group_name": "TAISTRA"
  }
 ]

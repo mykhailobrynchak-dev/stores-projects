@@ -19,18 +19,29 @@ from databricks import sql as dbsql
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT.parent  # custom-polygons/sources
 
-NETWORKS = {
-    "anri-pharm": "ANRI-PHARM",
-    "taistra": "TAISTRA",
+# Explicit provider_id lists per network (source of truth for which stores map).
+NETWORK_IDS = {
+    "taistra": [153567, 164280, 164283, 164306, 175229, 164329, 174008, 164331,
+                175689, 164334, 164337, 185488, 164340, 193395, 198369, 198370,
+                199390, 592669, 412660, 742667, 742668, 532658, 892761, 892762,
+                262812],
+    "anri-pharm": [203437, 862737, 203450, 203421, 203406, 203448, 203449, 203392,
+                   203398, 472722, 622759, 742739, 203397, 203453, 203447, 203396,
+                   203423, 203403, 203395, 203439, 203411, 203446, 203408, 562711,
+                   772725, 203393, 203433, 802731, 203418, 742738, 203429, 203409,
+                   203428, 203407, 203432, 203441, 203434, 203394, 203440, 203425,
+                   203438, 203400, 203426, 203419, 203416, 203415, 892722, 203420,
+                   203413, 203424, 203431, 203457, 203454, 203435, 203463, 203444,
+                   203402, 203410, 442714, 562705, 682721, 862732, 203459, 862522,
+                   472709],
 }
 
 STORE_Q = """
-SELECT provider_id, provider_name, city_name, provider_address,
+SELECT provider_id, provider_name, group_name, city_name, provider_address,
        CAST(provider_lat AS DOUBLE) AS lat, CAST(provider_lng AS DOUBLE) AS lng,
        provider_status
 FROM hive_metastore.ng_delivery_spark.dim_provider_v2
-WHERE group_name = '{group}' AND country_code = 'ua'
-  AND provider_status <> 'deleted'
+WHERE provider_id IN ({ids})
   AND provider_lat IS NOT NULL AND provider_lng IS NOT NULL
 ORDER BY city_name, provider_name
 """
@@ -71,14 +82,19 @@ def rows(cur, q):
 def main():
     conn = connect()
     cur = conn.cursor()
-    for slug, group in NETWORKS.items():
-        store_rows = rows(cur, STORE_Q.format(group=group))
+    for slug, ids in NETWORK_IDS.items():
+        id_list = ", ".join(str(i) for i in ids)
+        store_rows = rows(cur, STORE_Q.format(ids=id_list))
         stores = [{
             "name": r["provider_name"], "city": r["city_name"],
             "address": r["provider_address"], "lat": float(r["lat"]),
             "lon": float(r["lng"]), "provider_id": int(r["provider_id"]),
-            "status": r["provider_status"],
+            "status": r["provider_status"], "group_name": r["group_name"],
         } for r in store_rows]
+        found = {int(r["provider_id"]) for r in store_rows}
+        missing = [i for i in ids if i not in found]
+        if missing:
+            print(f"  [WARN] {slug}: {len(missing)} ids without coords/row: {missing}")
 
         cities = sorted({s["city"] for s in stores})
         city_list = ", ".join("'" + c.replace("'", "''") + "'" for c in cities)
@@ -109,7 +125,7 @@ def main():
             json.dumps(stores, ensure_ascii=False, indent=1), encoding="utf-8")
         (net_dir / "econ.json").write_text(
             json.dumps(econ, ensure_ascii=False, indent=1), encoding="utf-8")
-        print(f"{group:12s} -> {len(stores):3d} stores, {len(cities_econ)} cities "
+        print(f"{slug:12s} -> {len(stores):3d} stores, {len(cities_econ)} cities "
               f"{sorted(cities_econ)}")
     cur.close()
     conn.close()

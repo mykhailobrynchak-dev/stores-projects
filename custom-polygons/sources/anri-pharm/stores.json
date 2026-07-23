@@ -6,7 +6,18 @@
   "lat": 50.4946,
   "lon": 30.52131,
   "provider_id": 203420,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
+ },
+ {
+  "name": "ANRI-PHARM, Воскресенська 16",
+  "city": "Kyiv",
+  "address": "м. Київ Воскресенська 16",
+  "lat": 50.46972,
+  "lon": 30.601963,
+  "provider_id": 892722,
+  "status": "active",
+  "group_name": null
  },
  {
   "name": "ANRI-PHARM, Драгомирова 19-А, Липки-4 (Андрія Верхогляда)",
@@ -15,7 +26,8 @@
   "lat": 50.407542,
   "lon": 30.543602,
   "provider_id": 203448,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, Оболонський пр-т, 35",
@@ -24,7 +36,8 @@
   "lat": 50.518061,
   "lon": 30.497903,
   "provider_id": 203397,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, Степана Рудницького 19/14",
@@ -33,7 +46,8 @@
   "lat": 50.384328,
   "lon": 30.455977,
   "provider_id": 203400,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, Харківске шосе, 19 ТЦ \"Мегасіті\"",
@@ -42,7 +56,8 @@
   "lat": 50.431362,
   "lon": 30.634247,
   "provider_id": 203392,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, б-р Рильського Тадея, 5 прим.503-2",
@@ -51,7 +66,18 @@
   "lat": 50.370575,
   "lon": 30.445441,
   "provider_id": 203434,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
+ },
+ {
+  "name": "ANRI-PHARM, бульвар Тараса Шевченко , буд. 9",
+  "city": "Kyiv",
+  "address": "с. Святопетрівське, бульвар Тараса Шевченко , буд. 9",
+  "lat": 50.394594,
+  "lon": 30.319981,
+  "provider_id": 772725,
+  "status": "active",
+  "group_name": null
  },
  {
   "name": "ANRI-PHARM, вул Антоновича, 93",
@@ -60,7 +86,8 @@
   "lat": 50.42443,
   "lon": 30.516069,
   "provider_id": 203450,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Іоанна Павла, 20",
@@ -69,7 +96,8 @@
   "lat": 50.418196,
   "lon": 30.540168,
   "provider_id": 203424,
-  "status": "hidden"
+  "status": "hidden",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Артема,(Січових стрільців), 55",
@@ -78,7 +106,8 @@
   "lat": 50.455831,
   "lon": 30.493752,
   "provider_id": 203440,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Бажана, 1Е ТЦ \"Апетит\"",
@@ -87,7 +116,8 @@
   "lat": 50.396347,
   "lon": 30.614978,
   "provider_id": 203415,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Басейна, 23/52, прим. 31,32",
@@ -96,7 +126,8 @@
   "lat": 50.439283,
   "lon": 30.52541,
   "provider_id": 203421,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Богданівська, 7-Д",
@@ -105,7 +136,28 @@
   "lat": 50.435924,
   "lon": 30.478845,
   "provider_id": 203444,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
+ },
+ {
+  "name": "ANRI-PHARM, вул. Богданівська, 7Д",
+  "city": "Kyiv",
+  "address": "м. Київ, вул. Богданівська, 7Д",
+  "lat": 50.435924,
+  "lon": 30.478845,
+  "provider_id": 472722,
+  "status": "active",
+  "group_name": null
+ },
+ {
+  "name": "ANRI-PHARM, вул. В. Чорновола 26/2А",
+  "city": "Kyiv",
+  "address": "м. Київ вул. В. Чорновола 26/2А",
+  "lat": 50.452103,
+  "lon": 30.483305,
+  "provider_id": 742738,
+  "status": "active",
+  "group_name": null
  },
  {
   "name": "ANRI-PHARM, вул. Гмирі, 18",
@@ -114,7 +166,8 @@
   "lat": 50.39114,
   "lon": 30.63112,
   "provider_id": 203411,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Драгомирова 14а",
@@ -123,7 +176,18 @@
   "lat": 50.41259,
   "lon": 30.54558,
   "provider_id": 203398,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
+ },
+ {
+  "name": "ANRI-PHARM, вул. Жилянська, 59",
+  "city": "Kyiv",
+  "address": "м. Київ, вул. Жилянська, 59",
+  "lat": 50.438426,
+  "lon": 30.500416,
+  "provider_id": 622759,
+  "status": "active",
+  "group_name": null
  },
  {
   "name": "ANRI-PHARM, вул. Закревського, 95В",
@@ -132,7 +196,8 @@
   "lat": 50.52971,
   "lon": 30.62375,
   "provider_id": 203393,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Зарічна, 1Б",
@@ -141,7 +206,8 @@
   "lat": 50.39585,
   "lon": 30.59971,
   "provider_id": 203416,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Золотоустівська, 50",
@@ -150,7 +216,8 @@
   "lat": 50.45384,
   "lon": 30.4865,
   "provider_id": 203394,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Кудряшова(Мокра), 20, ЖК \"Пори року\"",
@@ -159,7 +226,18 @@
   "lat": 50.43005,
   "lon": 30.48716,
   "provider_id": 203395,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
+ },
+ {
+  "name": "ANRI-PHARM, вул. Маккейна Джона, 1",
+  "city": "Kyiv",
+  "address": "м. Київ, вул. Маккейна Джона, 1",
+  "lat": 50.413921,
+  "lon": 30.526289,
+  "provider_id": 562711,
+  "status": "active",
+  "group_name": null
  },
  {
   "name": "ANRI-PHARM, вул. Максимовича Михайла,24-Б, прим. 71 н",
@@ -168,7 +246,8 @@
   "lat": 50.393181,
   "lon": 30.473762,
   "provider_id": 203449,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Метрологічна, 14Б",
@@ -177,7 +256,8 @@
   "lat": 50.349912,
   "lon": 30.47638,
   "provider_id": 203413,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Метрологічна,19 (НОВУС)",
@@ -186,7 +266,8 @@
   "lat": 50.349612,
   "lon": 30.47717,
   "provider_id": 203438,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Польова,73 Караваєві дачі",
@@ -195,7 +276,8 @@
   "lat": 50.435602,
   "lon": 30.445819,
   "provider_id": 203453,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Регенераторна, 4 крп. 11, ЖК \"КомфортТаун\" КТ 2",
@@ -204,7 +286,8 @@
   "lat": 50.43526,
   "lon": 30.61891,
   "provider_id": 203408,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Руданського Степана,4-6 (Аптека Америка)",
@@ -213,7 +296,8 @@
   "lat": 50.469,
   "lon": 30.43123,
   "provider_id": 203454,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Тютюнника Василя (вул. Барбюса Анрі), 56",
@@ -222,7 +306,8 @@
   "lat": 50.41762,
   "lon": 30.52751,
   "provider_id": 203426,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Щербаківського, буд. 52",
@@ -231,7 +316,8 @@
   "lat": 50.471161,
   "lon": 30.407034,
   "provider_id": 203432,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул.Андрія Верхогляда 14",
@@ -240,7 +326,8 @@
   "lat": 50.41261,
   "lon": 30.54556,
   "provider_id": 203402,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул.Березнева 12, \"КТ-3\"",
@@ -249,7 +336,8 @@
   "lat": 50.431333,
   "lon": 30.620894,
   "provider_id": 203447,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул.Богдана Хмельницького, 66",
@@ -258,7 +346,8 @@
   "lat": 50.4477,
   "lon": 30.504309,
   "provider_id": 203431,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул.Гмирі Бориса 14-А,прим 217",
@@ -267,16 +356,8 @@
   "lat": 50.39113,
   "lon": 30.63107,
   "provider_id": 203463,
-  "status": "active"
- },
- {
-  "name": "ANRI-PHARM, вул.Ернста, 16Б",
-  "city": "Kyiv",
-  "address": "м. Київ, вул.Ернста, 16Б",
-  "lat": 50.415801,
-  "lon": 30.461784,
-  "provider_id": 203404,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул.Золотоустівська 25, ЖК Шевченківський",
@@ -285,7 +366,18 @@
   "lat": 50.4519,
   "lon": 30.4868,
   "provider_id": 203396,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
+ },
+ {
+  "name": "ANRI-PHARM, вул.Левка Лук'яненка 29",
+  "city": "Kyiv",
+  "address": "м. Київ, вул.Левка Лук'яненка 29",
+  "lat": 50.51315,
+  "lon": 30.50145,
+  "provider_id": 203406,
+  "status": "deleted",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул.О.Пчілки, 2а",
@@ -294,7 +386,8 @@
   "lat": 50.417045,
   "lon": 30.624694,
   "provider_id": 203419,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул.Панельна, 6 (Аболмасова Андрія)",
@@ -303,7 +396,8 @@
   "lat": 50.459374,
   "lon": 30.585287,
   "provider_id": 203425,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул.Сім'ї Кульженків, 37 (ЖК Яскравий)",
@@ -312,7 +406,8 @@
   "lat": 50.522552,
   "lon": 30.467198,
   "provider_id": 203423,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул.Теремківська, буд. 4-А (ЖК Республіка)",
@@ -321,7 +416,8 @@
   "lat": 50.371896,
   "lon": 30.449707,
   "provider_id": 203446,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, м. Ірпінь, вул. Університетська, 2ф/2, ЖК Карат",
@@ -330,7 +426,8 @@
   "lat": 50.50589,
   "lon": 30.23448,
   "provider_id": 203435,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, м. Бровари, вул. Чорновола, 6А",
@@ -339,7 +436,18 @@
   "lat": 50.51788,
   "lon": 30.78106,
   "provider_id": 203410,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
+ },
+ {
+  "name": "ANRI-PHARM, м. Вишгород, вул. Набережна, 6Г",
+  "city": "Kyiv",
+  "address": "м. Вишгород, вул. Набережна, 6Г",
+  "lat": 50.583126,
+  "lon": 30.485678,
+  "provider_id": 742739,
+  "status": "active",
+  "group_name": null
  },
  {
   "name": "ANRI-PHARM, м. Вишгород,Кургузова,1-А,корп.3 (Вышгород-1)",
@@ -348,7 +456,8 @@
   "lat": 50.58354,
   "lon": 30.47361,
   "provider_id": 203457,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, провулок Ясинуватський, буд. 10",
@@ -357,7 +466,8 @@
   "lat": 50.410111,
   "lon": 30.507309,
   "provider_id": 203433,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, проспект Палладіна Академіка, буд. 22",
@@ -366,7 +476,28 @@
   "lat": 50.461461,
   "lon": 30.357163,
   "provider_id": 203429,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
+ },
+ {
+  "name": "ANRI-PHARM, проспект Повітряних Сил 52",
+  "city": "Kyiv",
+  "address": "м. Київ, проспект Повітряних Сил 52",
+  "lat": 50.423552,
+  "lon": 30.45704,
+  "provider_id": 862737,
+  "status": "active",
+  "group_name": null
+ },
+ {
+  "name": "ANRI-PHARM, с. Гатне, вул. Одеська, 2",
+  "city": "Kyiv",
+  "address": "с. Гатне, вул. Одеська, 2",
+  "lat": 50.349476,
+  "lon": 30.424016,
+  "provider_id": 802731,
+  "status": "active",
+  "group_name": null
  },
  {
   "name": "ANRI-PHARM, с. Крюківщина, вул. Жулянська, 2а, ЖК\"Євромісто\"",
@@ -375,7 +506,8 @@
   "lat": 50.3764,
   "lon": 30.37837,
   "provider_id": 203407,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, с. Крюківщина, вул. Одеська, 22",
@@ -384,7 +516,8 @@
   "lat": 50.37045,
   "lon": 30.38184,
   "provider_id": 203428,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, с. Петропавлівська Борщагівка, ЖК \"Щасливий\", вул. Соборна, 10 А",
@@ -393,7 +526,8 @@
   "lat": 50.43698,
   "lon": 30.34921,
   "provider_id": 203409,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, с. Софіївська Борщагівка, вул. Івана Франка, 6",
@@ -402,7 +536,8 @@
   "lat": 50.4001,
   "lon": 30.37336,
   "provider_id": 203418,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, с. Софіївська Борщагівка, вул. Сагайдачного, 20а, ТЦ\"Львівський маєток\"",
@@ -411,7 +546,8 @@
   "lat": 50.40423,
   "lon": 30.335343,
   "provider_id": 203403,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, с. Софіївська Борщагівка, вул.Щаслива,19/6",
@@ -420,7 +556,8 @@
   "lat": 50.401279,
   "lon": 30.385581,
   "provider_id": 203441,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, с. Софіївська Борщагівка, пр-т Героїв Небесної Сотні, 24/83",
@@ -429,7 +566,8 @@
   "lat": 50.401379,
   "lon": 30.335505,
   "provider_id": 203437,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, с. Софіївська Борщагівка,вул.Соборна, 118-А",
@@ -438,7 +576,28 @@
   "lat": 50.40892,
   "lon": 30.33704,
   "provider_id": 203439,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
+ },
+ {
+  "name": "ANRI-PHARM, Замарстинівська, 170Л",
+  "city": "Lviv",
+  "address": "м. Львів, Замарстинівська, 170Л",
+  "lat": 49.86872,
+  "lon": 24.027125,
+  "provider_id": 442714,
+  "status": "active",
+  "group_name": null
+ },
+ {
+  "name": "ANRI-PHARM, Кульпарківська, 230А (duplicate of 203459)",
+  "city": "Lviv",
+  "address": "м. Кульпарківська, 230А корп3",
+  "lat": 49.803329,
+  "lon": 23.979904,
+  "provider_id": 862522,
+  "status": "onboarding",
+  "group_name": null
  },
  {
   "name": "ANRI-PHARM, Кульпарківська, 230А корп3, прим 1б (ЖК ФАМІЛІЯ)",
@@ -447,6 +606,47 @@
   "lat": 49.80368,
   "lon": 23.97937,
   "provider_id": 203459,
-  "status": "active"
+  "status": "active",
+  "group_name": "ANRI-PHARM"
+ },
+ {
+  "name": "ANRI-PHARM, Шевченка, 38",
+  "city": "Lviv",
+  "address": "м.Львів, Шевченка, 38",
+  "lat": 49.843998,
+  "lon": 24.01312,
+  "provider_id": 862732,
+  "status": "active",
+  "group_name": null
+ },
+ {
+  "name": "ANRI-PHARM, вул Франка,39",
+  "city": "Lviv",
+  "address": "м. Львів, вул Франка,39",
+  "lat": 49.83342,
+  "lon": 24.034276,
+  "provider_id": 472709,
+  "status": "active",
+  "group_name": null
+ },
+ {
+  "name": "ANRI-PHARM, вул. Малоголосківська, буд. 40a",
+  "city": "Lviv",
+  "address": "м. Львів, вул. Малоголосківська, буд. 40a",
+  "lat": 49.867185,
+  "lon": 23.999385,
+  "provider_id": 682721,
+  "status": "active",
+  "group_name": null
+ },
+ {
+  "name": "ANRI-PHARM, вул.І.Франка, 13",
+  "city": "Lviv",
+  "address": "м. Львів, вул.І.Франка, 13",
+  "lat": 49.836617,
+  "lon": 24.035152,
+  "provider_id": 562705,
+  "status": "active",
+  "group_name": null
  }
 ]
