@@ -140,6 +140,56 @@
   "group_name": "TAISTRA"
  },
  {
+  "name": "Тайстра бул. І. Газюка, 3",
+  "city": "Lutsk",
+  "address": "Луцьк, бул. Івана Газюка, 3",
+  "lat": 50.717621,
+  "lon": 25.310179,
+  "provider_id": 592669,
+  "status": "active",
+  "group_name": null
+ },
+ {
+  "name": "Тайстра вул. Ветеранів, 1А",
+  "city": "Lutsk",
+  "address": "Луцьк, вул. Ветеранів, 1А",
+  "lat": 50.759108,
+  "lon": 25.376006,
+  "provider_id": 532658,
+  "status": "onboarding",
+  "group_name": null
+ },
+ {
+  "name": "Тайстра вул. Конякіна, 14",
+  "city": "Lutsk",
+  "address": "Луцьк,  вул. Конякіна, 14",
+  "lat": 50.77448,
+  "lon": 25.361551,
+  "provider_id": 742668,
+  "status": "onboarding",
+  "group_name": null
+ },
+ {
+  "name": "Тайстра пр. Грушевського, 20",
+  "city": "Lutsk",
+  "address": "Луцьк, пр. Грушевського, 20",
+  "lat": 50.756544,
+  "lon": 25.344888,
+  "provider_id": 742667,
+  "status": "onboarding",
+  "group_name": null
+ },
+ {
+  "name": "Тайстра пр. Соборності, 22",
+  "city": "Lutsk",
+  "address": "Луцьк, просп. Соборності, 22",
+  "lat": 50.762765,
+  "lon": 25.365237,
+  "provider_id": 412660,
+  "status": "onboarding",
+  "group_name": null
+ },
+ {
   "name": "Тайстра вул. Грушевського",
   "city": "Ternopil",
   "address": "вул. Грушевського 1, м. Тернопіль",

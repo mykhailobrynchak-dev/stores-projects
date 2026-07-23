@@ -23,8 +23,11 @@ OUT = ROOT.parent  # custom-polygons/sources
 #   * "ids"    — explicit provider_id list (source of truth).
 #   * "group"  — group_name + provider_status filter (admin-style selection).
 NETWORKS = {
-    # TAISTRA: active + onboarding stores of the group (exclude hidden/archived/deleted).
-    "taistra": {"group": "TAISTRA", "statuses": ["active", "onboarding"]},
+    # TAISTRA: active + onboarding stores of the group (exclude hidden/archived/deleted),
+    # plus a few explicit Lutsk stores whose group_name is blank in the source table.
+    "taistra": {"group": "TAISTRA", "statuses": ["active", "onboarding"],
+                "extra_ids": [592669, 412660, 742667, 742668, 532658,
+                              892761, 892762, 262812]},
     # ANRI-PHARM: explicit provider_id list.
     "anri-pharm": {"ids": [
         203437, 862737, 203450, 203421, 203406, 203448, 203449, 203392,
@@ -51,9 +54,14 @@ def store_query(cfg):
     if "ids" in cfg:
         base += "  AND provider_id IN (" + ", ".join(str(i) for i in cfg["ids"]) + ")\n"
     else:
-        base += f"  AND group_name = '{cfg['group']}' AND country_code = 'ua'\n"
         st = ", ".join("'" + s + "'" for s in cfg["statuses"])
-        base += f"  AND provider_status IN ({st})\n"
+        grp = (f"(group_name = '{cfg['group']}' AND country_code = 'ua' "
+               f"AND provider_status IN ({st}))")
+        if cfg.get("extra_ids"):
+            ids = ", ".join(str(i) for i in cfg["extra_ids"])
+            base += f"  AND ( {grp} OR provider_id IN ({ids}) )\n"
+        else:
+            base += f"  AND {grp}\n"
     return base + "ORDER BY city_name, provider_name"
 
 ECON_Q = """
