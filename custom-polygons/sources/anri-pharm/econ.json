@@ -1,0 +1,16 @@
+{
+ "cities": {
+  "Kyiv": {
+   "dropoff": 2.481,
+   "cpo": 2.026,
+   "orders": 2704080
+  },
+  "Lviv": {
+   "dropoff": 2.492,
+   "cpo": 1.579,
+   "orders": 755375
+  }
+ },
+ "country_dropoff": 2.483,
+ "country_cpo": 1.928
+}

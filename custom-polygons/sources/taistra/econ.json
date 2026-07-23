@@ -1,0 +1,26 @@
+{
+ "cities": {
+  "Ivano-Frankivsk": {
+   "dropoff": 2.767,
+   "cpo": 1.529,
+   "orders": 161135
+  },
+  "Khmelnytskyi": {
+   "dropoff": 3.053,
+   "cpo": 1.435,
+   "orders": 52808
+  },
+  "Chernivtsi": {
+   "dropoff": 2.472,
+   "cpo": 1.292,
+   "orders": 88256
+  },
+  "Ternopil": {
+   "dropoff": 3.633,
+   "cpo": 1.576,
+   "orders": 20963
+  }
+ },
+ "country_dropoff": 2.789,
+ "country_cpo": 1.452
+}

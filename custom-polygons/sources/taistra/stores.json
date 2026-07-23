@@ -1,0 +1,155 @@
+[
+ {
+  "name": "Тайстра вул. Білоруська",
+  "city": "Chernivtsi",
+  "address": "вул. Білоруська 21, м. Чернівці",
+  "lat": 48.298366,
+  "lon": 25.949936,
+  "provider_id": 164283,
+  "status": "active"
+ },
+ {
+  "name": "Тайстра вул. Воробкевича, 1А",
+  "city": "Chernivtsi",
+  "address": "м. Чернівці, вул. Воробкевича, 1А",
+  "lat": 48.26069,
+  "lon": 25.94271,
+  "provider_id": 892761,
+  "status": "onboarding"
+ },
+ {
+  "name": "Тайстра вул. Героїв Майдану, 226А",
+  "city": "Chernivtsi",
+  "address": "Героїв Майдану 226А чернвці",
+  "lat": 48.264158,
+  "lon": 25.926303,
+  "provider_id": 153567,
+  "status": "active"
+ },
+ {
+  "name": "Тайстра вул. Героїв Майдану, 7",
+  "city": "Chernivtsi",
+  "address": "Героїв Майдану, 7 чернвці",
+  "lat": 48.28493,
+  "lon": 25.93336,
+  "provider_id": 199390,
+  "status": "active"
+ },
+ {
+  "name": "Тайстра вул. Руська, 219",
+  "city": "Chernivtsi",
+  "address": "м. Чернвці, вул. Руська, 219",
+  "lat": 48.28066,
+  "lon": 25.97932,
+  "provider_id": 175229,
+  "status": "active"
+ },
+ {
+  "name": "Тайстра вул. Трепка, 2",
+  "city": "Chernivtsi",
+  "address": "м. Чернівці, вул. Трепка, 2",
+  "lat": 48.277994,
+  "lon": 25.942847,
+  "provider_id": 892762,
+  "status": "onboarding"
+ },
+ {
+  "name": "Тайстра вул. Фастівська 35А",
+  "city": "Chernivtsi",
+  "address": "м. Чернівці, вул. Фастівська 35А",
+  "lat": 48.287933,
+  "lon": 25.975324,
+  "provider_id": 262812,
+  "status": "onboarding"
+ },
+ {
+  "name": "Тайстра вул. Незалежності",
+  "city": "Ivano-Frankivsk",
+  "address": "вул. Незалежності 162, м. Івано-Франківськ",
+  "lat": 48.915811,
+  "lon": 24.735339,
+  "provider_id": 164329,
+  "status": "active"
+ },
+ {
+  "name": "Тайстра вул. Пасічна, 2",
+  "city": "Ivano-Frankivsk",
+  "address": "м. Івано-Франківськ, вул. Пасічна, 2, корпус А",
+  "lat": 48.941674,
+  "lon": 24.694842,
+  "provider_id": 175689,
+  "status": "active"
+ },
+ {
+  "name": "Тайстра вул. Целевича, 20",
+  "city": "Ivano-Frankivsk",
+  "address": "вул. Целевича 20, м. Івано-Франківськ",
+  "lat": 48.94379,
+  "lon": 24.70422,
+  "provider_id": 164331,
+  "status": "hidden"
+ },
+ {
+  "name": "Тайстра вул. Целевича, 34",
+  "city": "Ivano-Frankivsk",
+  "address": "вул. Ю. Целевича 34, м. Івано-Франківськ",
+  "lat": 48.94377,
+  "lon": 24.70422,
+  "provider_id": 174008,
+  "status": "active"
+ },
+ {
+  "name": "Тайстра вул. Інститутська",
+  "city": "Khmelnytskyi",
+  "address": "вул. Інститутська 10, м. Хмельницький",
+  "lat": 49.40975,
+  "lon": 26.96012,
+  "provider_id": 164334,
+  "status": "active"
+ },
+ {
+  "name": "Тайстра вул. Соборна",
+  "city": "Khmelnytskyi",
+  "address": "вул. Соборна, 43, м. Хмельницький",
+  "lat": 49.423476,
+  "lon": 26.980979,
+  "provider_id": 198369,
+  "status": "active"
+ },
+ {
+  "name": "Тайстра вул. Трудова, 11",
+  "city": "Khmelnytskyi",
+  "address": "вул. Трудова, 11, м. Хмельницький",
+  "lat": 49.41129,
+  "lon": 27.01519,
+  "provider_id": 193395,
+  "status": "active"
+ },
+ {
+  "name": "Тайстра просп. Миру",
+  "city": "Khmelnytskyi",
+  "address": "Проспект Миру 78, м. Хмельницький",
+  "lat": 49.437078,
+  "lon": 27.007212,
+  "provider_id": 164337,
+  "status": "active"
+ },
+ {
+  "name": "Тайстра вул. Грушевського",
+  "city": "Ternopil",
+  "address": "вул. Грушевського 1, м. Тернопіль",
+  "lat": 49.553519,
+  "lon": 25.594079,
+  "provider_id": 164340,
+  "status": "active"
+ },
+ {
+  "name": "Тайстра вул. Степана Бандери",
+  "city": "Ternopil",
+  "address": "вул. Степана Бандери, 72, м. Тернопіль",
+  "lat": 49.549645,
+  "lon": 25.622479,
+  "provider_id": 198370,
+  "status": "active"
+ }
+]
