@@ -1,56 +1,56 @@
 {
  "cities": {
-  "Kyiv": {
-   "dropoff": 2.527,
-   "cpo": 2.4,
-   "orders": 465033
-  },
-  "Irpin": {
-   "dropoff": 2.915,
-   "cpo": 2.76,
-   "orders": 11188
-  },
-  "Brovary": {
-   "dropoff": 2.135,
-   "cpo": 2.19,
-   "orders": 7055
+  "Bila Tserkva": {
+   "dropoff": 3.473,
+   "cpo": 2.425,
+   "orders": 17957
   },
   "Boryspil": {
-   "dropoff": 2.119,
-   "cpo": 1.95,
-   "orders": 5271
+   "dropoff": 2.13,
+   "cpo": 2.154,
+   "orders": 15940
   },
-  "Bila Tserkva": {
-   "dropoff": 3.398,
-   "cpo": 2.35,
-   "orders": 5868
-  },
-  "Rivne": {
-   "dropoff": 3.28,
-   "cpo": 2.29,
-   "orders": 10228
-  },
-  "Zhytomyr": {
-   "dropoff": 2.817,
-   "cpo": 2.12,
-   "orders": 10423
-  },
-  "Vinnytsia": {
-   "dropoff": 2.369,
-   "cpo": 2.09,
-   "orders": 65343
-  },
-  "Vyshhorod": {
-   "dropoff": 3.164,
-   "cpo": 4.32,
-   "orders": 112
+  "Brovary": {
+   "dropoff": 2.165,
+   "cpo": 2.288,
+   "orders": 20351
   },
   "Chernihiv": {
-   "dropoff": 2.889,
-   "cpo": 2.45,
-   "orders": 4767
+   "dropoff": 2.883,
+   "cpo": 2.386,
+   "orders": 11774
+  },
+  "Irpin": {
+   "dropoff": 2.923,
+   "cpo": 2.84,
+   "orders": 32454
+  },
+  "Kyiv": {
+   "dropoff": 2.493,
+   "cpo": 2.781,
+   "orders": 1344754
+  },
+  "Rivne": {
+   "dropoff": 3.437,
+   "cpo": 2.388,
+   "orders": 34733
+  },
+  "Vinnytsia": {
+   "dropoff": 2.33,
+   "cpo": 2.221,
+   "orders": 200112
+  },
+  "Vyshhorod": {
+   "dropoff": 3.296,
+   "cpo": 2.758,
+   "orders": 557
+  },
+  "Zhytomyr": {
+   "dropoff": 2.773,
+   "cpo": 2.213,
+   "orders": 34840
   }
  },
- "country_cpo": 2.33,
- "country_dropoff": 2.66
+ "country_dropoff": 2.513,
+ "country_cpo": 2.679
 }

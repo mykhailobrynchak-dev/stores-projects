@@ -74,7 +74,8 @@ def load_stores():
         if not (-90 <= lat <= 90 and -180 <= lon <= 180):
             continue
         stores.append({"name": r.get("name", "").strip(), "city": r.get("city", "").strip(),
-                       "address": r.get("address", "").strip(), "lat": lat, "lon": lon})
+                       "address": r.get("address", "").strip(), "lat": lat, "lon": lon,
+                       "provider_id": r.get("provider_id")})
     return stores
 
 # ---------------------------------------------------------------------------
@@ -397,6 +398,7 @@ def main():
 
         out_cities[city] = {
             "stores": [{"name": s["name"], "address": s["address"],
+                        "providerId": s.get("provider_id"),
                         "lat": s["lat"], "lon": s["lon"], "radiusB": radiiB[i],
                         "reachB": statsB[i]["reach"], "cannibB": statsB[i]["cannib"],
                         "cpoB": statsB[i]["cpo"]}
@@ -454,7 +456,7 @@ def main():
 
     with open(NET_DIR / "recommended_radii.csv", "w", newline="", encoding="utf-8") as f:
         wri = csv.writer(f)
-        wri.writerow(["City", "Store name", "Address", "Latitude", "Longitude",
+        wri.writerow(["Provider ID", "City", "Store name", "Address", "Latitude", "Longitude",
                       "Radius_OptionA_cityUniform_km", "Radius_OptionB_perStore_km",
                       "Radius_OptionC_countryUnified_km",
                       "OptionB_demand_reach_%", "OptionB_cannibalization_%", "OptionB_CPO_EUR"])
@@ -462,7 +464,7 @@ def main():
             ra = cd["optionA"]["radius"]
             rc = result["countryUnified"]["radius"]
             for s in cd["stores"]:
-                wri.writerow([city, s["name"], s["address"], s["lat"], s["lon"],
+                wri.writerow([s.get("providerId", ""), city, s["name"], s["address"], s["lat"], s["lon"],
                               ra, s["radiusB"], rc,
                               round(s["reachB"] * 100, 1), round(s["cannibB"] * 100, 1), s["cpoB"]])
 

@@ -1,16 +1,31 @@
 {
  "cities": {
+  "Brovary": {
+   "dropoff": 3.633,
+   "cpo": 2.598,
+   "orders": 0
+  },
+  "Irpin": {
+   "dropoff": 3.633,
+   "cpo": 2.598,
+   "orders": 0
+  },
   "Kyiv": {
-   "dropoff": 2.481,
-   "cpo": 2.027,
-   "orders": 2705865
+   "dropoff": 3.334,
+   "cpo": 2.552,
+   "orders": 874
   },
   "Lviv": {
-   "dropoff": 2.492,
-   "cpo": 1.58,
-   "orders": 755766
+   "dropoff": 5.198,
+   "cpo": 2.839,
+   "orders": 167
+  },
+  "Vyshhorod": {
+   "dropoff": 3.633,
+   "cpo": 2.598,
+   "orders": 0
   }
  },
- "country_dropoff": 2.483,
- "country_cpo": 1.929
+ "country_dropoff": 3.633,
+ "country_cpo": 2.598
 }

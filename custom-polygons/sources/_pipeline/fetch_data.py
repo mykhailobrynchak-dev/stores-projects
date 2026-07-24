@@ -22,14 +22,15 @@ OUT = ROOT.parent  # custom-polygons/sources
 # Per-network store selection. Two modes:
 #   * "ids"    — explicit provider_id list (source of truth).
 #   * "group"  — group_name + provider_status filter (admin-style selection).
+# econ modes: "network" (network's own providers, full CPO), "city_full"
+# (city-wide, full CPO), "city" (city-wide, courier earning only).
 NETWORKS = {
-    # TAISTRA: active + onboarding stores of the group (exclude hidden/archived/deleted),
-    # plus a few explicit Lutsk stores whose group_name is blank in the source table.
     "taistra": {"group": "TAISTRA", "statuses": ["active", "onboarding"],
                 "extra_ids": [592669, 412660, 742667, 742668, 532658,
                               892761, 892762, 262812],
-                "econ_full": True},
-    # ANRI-PHARM: explicit provider_id list.
+                "econ": "network"},
+    # ANRI-PHARM: explicit provider_id list; dim_provider_v2 labels every store
+    # "Kyiv", so split the agglomeration into real cities by name/address.
     "anri-pharm": {"ids": [
         203437, 862737, 203450, 203421, 203406, 203448, 203449, 203392,
         203398, 472722, 622759, 742739, 203397, 203453, 203447, 203396,
@@ -39,8 +40,24 @@ NETWORKS = {
         203438, 203400, 203426, 203419, 203416, 203415, 892722, 203420,
         203413, 203424, 203431, 203457, 203454, 203435, 203463, 203444,
         203402, 203410, 442714, 562705, 682721, 862732, 203459, 862522,
-        472709]},
+        472709], "econ": "network", "split_by_address": True},
+    # FORA: whole group (onboarding), city-wide full CPO (stores not live yet).
+    "fora": {"group": "FORA", "statuses": ["active", "onboarding"], "econ": "city_full"},
 }
+
+# address/name keywords -> city, for splitting mis-labelled agglomeration stores
+SPLIT_KW = [("Бровари", "Brovary"), ("Brovary", "Brovary"),
+            ("Вишгород", "Vyshhorod"), ("Вышгород", "Vyshhorod"), ("Vyshhorod", "Vyshhorod"),
+            ("Ірпінь", "Irpin"), ("Ирпень", "Irpin"), ("Irpin", "Irpin"),
+            ("Буча", "Bucha"), ("Bucha", "Bucha")]
+
+
+def resolve_city(s):
+    hay = f"{s.get('name','')} {s.get('address','')}"
+    for kw, city in SPLIT_KW:
+        if kw in hay:
+            return city
+    return s["city"]
 
 STORE_COLS = """
 SELECT provider_id, provider_name, group_name, city_name, provider_address,
@@ -79,19 +96,31 @@ WHERE order_state = 'delivered' AND city_country_code = 'ua'
 GROUP BY city_name
 """
 
-# Network-specific "full" CPO = courier earning + bonus + waiting compensation
-# (matches the ~€2.24 delivery CPO in the weekly report), over the network's own
-# providers and last ~6 months. Used when a network sets "econ_full": True.
-ECON_FULL_Q = """
-SELECT city_name,
-       COUNT(*) AS orders,
+# Full CPO = courier earning + bonus + waiting compensation (matches the ~€2.24
+# delivery CPO in the weekly report). ECON_FULL_Q = the network's own providers;
+# ECON_CITY_FULL_Q = city-wide (used for onboarding networks with no live orders).
+_FULL_CPO = ("ROUND(AVG(COALESCE(courier_earning_eur,0)+COALESCE(courier_bonus_eur,0)"
+             "+COALESCE(courier_waiting_at_provider_compensation_eur,0)), 3) AS cpo_eur")
+ECON_FULL_Q = f"""
+SELECT city_name, COUNT(*) AS orders,
        ROUND(AVG(courier_distance_from_provider_to_eater_meters)/1000.0, 3) AS dropoff_km,
-       ROUND(AVG(COALESCE(courier_earning_eur,0)+COALESCE(courier_bonus_eur,0)
-                 +COALESCE(courier_waiting_at_provider_compensation_eur,0)), 3) AS cpo_eur
+       {_FULL_CPO}
 FROM hive_metastore.ng_delivery_spark.fact_order_delivery
 WHERE order_state = 'delivered'
   AND order_created_date >= date_sub(current_date(), 182)
-  AND provider_id IN ({ids})
+  AND provider_id IN ({{ids}})
+  AND courier_distance_from_provider_to_eater_meters > 0
+  AND courier_distance_from_provider_to_eater_meters < 20000
+GROUP BY city_name
+"""
+ECON_CITY_FULL_Q = f"""
+SELECT city_name, COUNT(*) AS orders,
+       ROUND(AVG(courier_distance_from_provider_to_eater_meters)/1000.0, 3) AS dropoff_km,
+       {_FULL_CPO}
+FROM hive_metastore.ng_delivery_spark.fact_order_delivery
+WHERE order_state = 'delivered' AND city_country_code = 'ua'
+  AND order_created_date >= date_sub(current_date(), 182)
+  AND city_name IN ({{cities}})
   AND courier_distance_from_provider_to_eater_meters > 0
   AND courier_distance_from_provider_to_eater_meters < 20000
 GROUP BY city_name
@@ -133,13 +162,19 @@ def main():
             missing = [i for i in cfg["ids"] if i not in found]
             if missing:
                 print(f"  [WARN] {slug}: {len(missing)} ids without coords/row: {missing}")
+        if cfg.get("split_by_address"):
+            for s in stores:
+                s["city"] = resolve_city(s)
 
         cities = sorted({s["city"] for s in stores})
-        if cfg.get("econ_full"):
+        econ_mode = cfg.get("econ", "city")
+        city_list = ", ".join("'" + c.replace("'", "''") + "'" for c in cities)
+        if econ_mode == "network":
             id_list = ", ".join(str(s["provider_id"]) for s in stores)
             econ_rows = rows(cur, ECON_FULL_Q.format(ids=id_list))
+        elif econ_mode == "city_full":
+            econ_rows = rows(cur, ECON_CITY_FULL_Q.format(cities=city_list))
         else:
-            city_list = ", ".join("'" + c.replace("'", "''") + "'" for c in cities)
             econ_rows = rows(cur, ECON_Q.format(cities=city_list))
 
         raw = {r["city_name"]: {"dropoff": float(r["dropoff_km"]), "cpo": float(r["cpo_eur"]),

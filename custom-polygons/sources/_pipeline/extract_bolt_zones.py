@@ -7,9 +7,12 @@ is measured over the Bolt zone, not over OSM residential area or a fixed buffer.
 
 Usage: python3 extract_bolt_zones.py <network_dir>
 """
-import json, sys, zipfile, io
+import json, math, sys, zipfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+RING_NEAR_KM = 5.0  # keep only zone rings within this distance of the city's stores
+                    # (splits shared combined files like Bucha+Irpin+Brovary+Vyshhorod)
 
 KML_DIR = Path("/Users/mishabrynchak/My Drive/Cursor folder/Tasks/Stores location check/Bolt polygons")
 NS = {"k": "http://www.opengis.net/kml/2.2"}
@@ -60,10 +63,28 @@ def rings_from_kml(text: str):
     return rings
 
 
+def _ring_near_stores(ring, pts, near_km):
+    """True if the ring is within near_km of any store (min vertex distance) or
+    contains a store. Coordinates are [lat,lon]; distance via equirectangular km."""
+    if not pts:
+        return True
+    lat0 = sum(p[0] for p in pts) / len(pts)
+    kx = 111.320 * math.cos(math.radians(lat0)); ky = 110.574
+    rx = [lon * kx for lat, lon in ring]; ry = [lat * ky for lat, lon in ring]
+    for slat, slon in pts:
+        sx, sy = slon * kx, slat * ky
+        if min((rx[i] - sx) ** 2 + (ry[i] - sy) ** 2 for i in range(len(ring))) <= near_km ** 2:
+            return True
+    return False
+
+
 def main():
     net_dir = Path(sys.argv[1]).resolve()
     stores = json.loads((net_dir / "stores.json").read_text(encoding="utf-8"))
     cities = sorted({s["city"] for s in stores})
+    pts_by_city = {}
+    for s in stores:
+        pts_by_city.setdefault(s["city"], []).append((s["lat"], s["lon"]))
     for city in cities:
         files = BOLT_FILES.get(city)
         if not files:
@@ -76,6 +97,8 @@ def main():
                 print(f"  [WARN] missing {fn}")
                 continue
             rings += rings_from_kml(read_kml(p))
+        pts = pts_by_city.get(city, [])
+        rings = [r for r in rings if _ring_near_stores(r, pts, RING_NEAR_KM)]
         if rings:
             (net_dir / f"boltzone_{city}.json").write_text(
                 json.dumps(rings, ensure_ascii=False), encoding="utf-8")
