@@ -161,6 +161,39 @@ def build_grid_demand(city, lst, xs, ys, proj):
     dy = cy[:, None] - ys[None, :].astype(np.float32)
     D = np.sqrt(dx * dx + dy * dy).astype(np.float32)
 
+    # Bolt delivery-zone territory (official service area) as the demand basis:
+    # a cell counts as demand only if it lies inside the city's Bolt polygon.
+    # Within the zone it is weighted by real order density where available,
+    # otherwise uniformly. Coverage is thus measured over the real delivery area.
+    if PARAMS.get("demand") == "bolt":
+        bz = NET_DIR / f"boltzone_{city}.json"
+        if bz.exists():
+            from matplotlib.path import Path as MplPath
+            lat0, lon0, kx, ky = proj
+            rings = json.loads(bz.read_text())
+            paths = [MplPath([((lon - lon0) * kx, (lat - lat0) * ky) for lat, lon in r])
+                     for r in rings if len(r) >= 3]
+            pts = np.column_stack([cx, cy])
+            mask = np.zeros(len(cx), dtype=bool)
+            for p in paths:
+                mask |= p.contains_points(pts)
+            w = mask.astype(np.float32)
+            of = NET_DIR / f"orders_{city}.json"
+            if of.exists():
+                opts = json.loads(of.read_text())
+                if sum(c for _, _, c in opts) >= PARAMS.get("min_orders", 30):
+                    w2d = np.zeros((len(gy), len(gx)), dtype=np.float64)
+                    for lat, lon, c in opts:
+                        px = (lon - lon0) * kx; py = (lat - lat0) * ky
+                        ix = int(round((px - gx[0]) / CELL_KM))
+                        iy = int(round((py - gy[0]) / CELL_KM))
+                        if 0 <= ix < len(gx) and 0 <= iy < len(gy):
+                            w2d[iy, ix] += c
+                    wo = _gaussian_blur(w2d, 2.0).ravel().astype(np.float32) * w
+                    if wo.sum() > 0:
+                        w = wo
+            return D, w, "bolt"
+
     # Real order-density demand surface (where deliveries actually happen).
     # Cities with too few historical orders (e.g. onboarding) fall back to residential.
     if PARAMS.get("demand") == "orders":
@@ -348,12 +381,12 @@ def main():
 
         bestA, curve = optimize_uniform(city, D, w, n)
         _p = PARAMS.get("outage_prob", 0.0)
-        if _p and _p > 0 and src == "orders":
+        if _p and _p > 0 and src in ("orders", "bolt"):
             radiiB = optimize_resilient(city, D, w, n,
                                         PARAMS.get("backup_target", 0.85),
                                         rmin=1.0, rmax=PS_RMAX)
         elif _p and _p > 0:
-            # no real order history (e.g. onboarding city) -> provisional default
+            # no demand surface (no zone/orders) -> provisional default
             radiiB = [round(min(bestA["r"], 3.0), 1)] * n
         else:
             radiiB = optimize_perstore(city, D, w, n, xs, ys, bestA["r"])
@@ -434,8 +467,9 @@ def main():
                               round(s["reachB"] * 100, 1), round(s["cannibB"] * 100, 1), s["cpoB"]])
 
     resid = {}
+    _bolt = PARAMS.get("demand") == "bolt"
     for city in out_cities:
-        fn = NET_DIR / f"residential_{city}.json"
+        fn = NET_DIR / (f"boltzone_{city}.json" if _bolt else f"residential_{city}.json")
         polys = json.loads(fn.read_text()) if fn.exists() else []
         simp = []
         for ring in polys:

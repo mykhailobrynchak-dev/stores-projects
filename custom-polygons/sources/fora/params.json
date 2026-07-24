@@ -1,0 +1,6 @@
+{
+ "demand": "bolt",
+ "buffer_km": 7.0,
+ "rmax": 5.0,
+ "ps_rmax": 3.5
+}

@@ -17,6 +17,7 @@ TEMPLATES = {
     "manual-editor": "fora-manual-editor.html",
 }
 NETWORKS = {
+    "fora": "FORA",
     "anri-pharm": "ANRI-PHARM",
     "taistra": "TAISTRA",
 }
