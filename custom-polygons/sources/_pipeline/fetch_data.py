@@ -27,7 +27,8 @@ NETWORKS = {
     # plus a few explicit Lutsk stores whose group_name is blank in the source table.
     "taistra": {"group": "TAISTRA", "statuses": ["active", "onboarding"],
                 "extra_ids": [592669, 412660, 742667, 742668, 532658,
-                              892761, 892762, 262812]},
+                              892761, 892762, 262812],
+                "econ_full": True},
     # ANRI-PHARM: explicit provider_id list.
     "anri-pharm": {"ids": [
         203437, 862737, 203450, 203421, 203406, 203448, 203449, 203392,
@@ -78,6 +79,25 @@ WHERE order_state = 'delivered' AND city_country_code = 'ua'
 GROUP BY city_name
 """
 
+# Network-specific "full" CPO = courier earning + bonus + waiting compensation
+# (matches the ~€2.24 delivery CPO in the weekly report), over the network's own
+# providers and last ~6 months. Used when a network sets "econ_full": True.
+ECON_FULL_Q = """
+SELECT city_name,
+       COUNT(*) AS orders,
+       ROUND(AVG(courier_distance_from_provider_to_eater_meters)/1000.0, 3) AS dropoff_km,
+       ROUND(AVG(COALESCE(courier_earning_eur,0)+COALESCE(courier_bonus_eur,0)
+                 +COALESCE(courier_waiting_at_provider_compensation_eur,0)), 3) AS cpo_eur
+FROM hive_metastore.ng_delivery_spark.fact_order_delivery
+WHERE order_state = 'delivered'
+  AND order_created_date >= date_sub(current_date(), 182)
+  AND provider_id IN ({ids})
+  AND courier_distance_from_provider_to_eater_meters > 0
+  AND courier_distance_from_provider_to_eater_meters < 20000
+GROUP BY city_name
+"""
+MIN_ORDERS_ROBUST = 50  # cities below this fall back to network avg econ
+
 
 def connect():
     host = os.environ["DATABRICKS_HOST"]
@@ -115,27 +135,31 @@ def main():
                 print(f"  [WARN] {slug}: {len(missing)} ids without coords/row: {missing}")
 
         cities = sorted({s["city"] for s in stores})
-        city_list = ", ".join("'" + c.replace("'", "''") + "'" for c in cities)
-        econ_rows = rows(cur, ECON_Q.format(cities=city_list))
+        if cfg.get("econ_full"):
+            id_list = ", ".join(str(s["provider_id"]) for s in stores)
+            econ_rows = rows(cur, ECON_FULL_Q.format(ids=id_list))
+        else:
+            city_list = ", ".join("'" + c.replace("'", "''") + "'" for c in cities)
+            econ_rows = rows(cur, ECON_Q.format(cities=city_list))
+
+        raw = {r["city_name"]: {"dropoff": float(r["dropoff_km"]), "cpo": float(r["cpo_eur"]),
+                                "orders": int(r["orders"])} for r in econ_rows}
+        # network average from robust cities (enough orders) for fallback
+        robust = {c: v for c, v in raw.items() if v["orders"] >= MIN_ORDERS_ROBUST}
+        base = robust or raw
+        tot = sum(v["orders"] for v in base.values()) or 1
+        avg_drop = round(sum(v["dropoff"] * v["orders"] for v in base.values()) / tot, 3)
+        avg_cpo = round(sum(v["cpo"] * v["orders"] for v in base.values()) / tot, 3)
+
         cities_econ = {}
-        tot_orders = 0
-        w_drop = 0.0
-        w_cpo = 0.0
-        for r in econ_rows:
-            o = int(r["orders"])
-            cities_econ[r["city_name"]] = {
-                "dropoff": float(r["dropoff_km"]),
-                "cpo": float(r["cpo_eur"]),
-                "orders": o,
-            }
-            tot_orders += o
-            w_drop += float(r["dropoff_km"]) * o
-            w_cpo += float(r["cpo_eur"]) * o
-        econ = {
-            "cities": cities_econ,
-            "country_dropoff": round(w_drop / tot_orders, 3) if tot_orders else 2.6,
-            "country_cpo": round(w_cpo / tot_orders, 3) if tot_orders else 2.0,
-        }
+        for c in cities:
+            v = raw.get(c)
+            if v and v["orders"] >= MIN_ORDERS_ROBUST:
+                cities_econ[c] = v
+            else:  # sparse / missing city -> use network average (avoids noisy anchors)
+                cities_econ[c] = {"dropoff": avg_drop, "cpo": avg_cpo,
+                                  "orders": v["orders"] if v else 0}
+        econ = {"cities": cities_econ, "country_dropoff": avg_drop, "country_cpo": avg_cpo}
 
         net_dir = OUT / slug
         net_dir.mkdir(parents=True, exist_ok=True)

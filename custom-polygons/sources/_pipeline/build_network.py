@@ -137,6 +137,19 @@ def _dilate(w, shape, dist_km):
             out |= np.roll(np.roll(grid, dyi, axis=0), dxi, axis=1)
     return out.reshape(-1).astype(np.float32)
 
+def _gaussian_blur(w2d, sigma_cells):
+    """Light separable-ish Gaussian smoothing over the 2D grid (few np.roll ops)."""
+    rad = max(1, int(round(sigma_cells * 2)))
+    out = np.zeros_like(w2d)
+    tot = 0.0
+    for dyi in range(-rad, rad + 1):
+        for dxi in range(-rad, rad + 1):
+            g = np.exp(-(dyi * dyi + dxi * dxi) / (2.0 * sigma_cells * sigma_cells))
+            out += g * np.roll(np.roll(w2d, dyi, axis=0), dxi, axis=1)
+            tot += g
+    return out / tot
+
+
 def build_grid_demand(city, lst, xs, ys, proj):
     x0, x1 = xs.min() - BUFFER_KM, xs.max() + BUFFER_KM
     y0, y1 = ys.min() - BUFFER_KM, ys.max() + BUFFER_KM
@@ -147,6 +160,24 @@ def build_grid_demand(city, lst, xs, ys, proj):
     dx = cx[:, None] - xs[None, :].astype(np.float32)
     dy = cy[:, None] - ys[None, :].astype(np.float32)
     D = np.sqrt(dx * dx + dy * dy).astype(np.float32)
+
+    # Real order-density demand surface (where deliveries actually happen).
+    # Cities with too few historical orders (e.g. onboarding) fall back to residential.
+    if PARAMS.get("demand") == "orders":
+        of = NET_DIR / f"orders_{city}.json"
+        if of.exists():
+            pts = json.loads(of.read_text())
+            if sum(c for _, _, c in pts) >= PARAMS.get("min_orders", 30):
+                lat0, lon0, kx, ky = proj
+                w2d = np.zeros((len(gy), len(gx)), dtype=np.float64)
+                for lat, lon, c in pts:
+                    px = (lon - lon0) * kx; py = (lat - lat0) * ky
+                    ix = int(round((px - gx[0]) / CELL_KM))
+                    iy = int(round((py - gy[0]) / CELL_KM))
+                    if 0 <= ix < len(gx) and 0 <= iy < len(gy):
+                        w2d[iy, ix] += c
+                w2d = _gaussian_blur(w2d, sigma_cells=2.0)  # ~0.4 km smoothing
+                return D, w2d.ravel().astype(np.float32), "orders"
 
     paths = load_residential(city, proj)
     if paths:
@@ -253,6 +284,53 @@ def optimize_perstore(city, D, w, n, xs, ys, optA_radius):
     r = np.clip(r, PS_RMIN, PS_RMAX)
     return [round(float(x), 1) for x in r]
 
+def resil_coverage(D, w, radii, p):
+    """Expected share of demand served when each store is independently
+    unavailable with probability p. A cell reachable by k stores is served
+    with probability 1 - p**k (a backup store rescues it when the primary is down)."""
+    member = D <= np.asarray(radii, dtype=np.float32)[None, :]
+    k = member.sum(axis=1)
+    total = float(w.sum())
+    served = np.where(k > 0, 1.0 - p ** k, 0.0)
+    return float((w * served).sum()) / total if total else 0.0
+
+
+def optimize_resilient(city, D, w, n, backup_target, cov_target=0.97,
+                       rmin=1.0, rmax=None, step=0.1):
+    """Single resilient radius per city: the smallest uniform radius such that
+    >= backup_target of order demand is reachable by TWO OR MORE stores (so any
+    single store outage still leaves a backup for those customers).
+
+    A uniform (symmetric) radius is used on purpose: minimizing individual radii
+    degenerates (stores shrink to a floor and offload orders to a far neighbour,
+    which RAISES delivery distance under nearest-store dispatch). A common radius
+    keeps every store serving its own nearby orders (low CPO) while guaranteeing
+    mutual backup. For a lone store (no redundancy possible) it just covers the
+    order mass.
+    """
+    if rmax is None:
+        rmax = PS_RMAX
+    total = float(w.sum())
+
+    def cov1(R):
+        return float(w[(D[:, 0] <= R) if n == 1 else ((D <= R).sum(1) >= 1)].sum()) / total \
+            if total else 0.0
+
+    def backup(R):
+        return float(w[(D <= R).sum(1) >= 2].sum()) / total if total else 0.0
+
+    if n == 1:
+        for R in np.arange(rmin, rmax + 1e-9, step):
+            if cov1(round(float(R), 1)) >= cov_target or R >= rmax - 1e-9:
+                return [round(float(R), 1)]
+        return [round(rmax, 1)]
+
+    for R in np.arange(rmin, rmax + 1e-9, step):
+        if backup(R) >= backup_target - 1e-9:
+            return [round(float(R), 1)] * n
+    return [round(rmax, 1)] * n
+
+
 def main():
     stores = load_stores()
     cities = {}
@@ -269,7 +347,16 @@ def main():
         city_D[city] = (D, w)
 
         bestA, curve = optimize_uniform(city, D, w, n)
-        radiiB = optimize_perstore(city, D, w, n, xs, ys, bestA["r"])
+        _p = PARAMS.get("outage_prob", 0.0)
+        if _p and _p > 0 and src == "orders":
+            radiiB = optimize_resilient(city, D, w, n,
+                                        PARAMS.get("backup_target", 0.85),
+                                        rmin=1.0, rmax=PS_RMAX)
+        elif _p and _p > 0:
+            # no real order history (e.g. onboarding city) -> provisional default
+            radiiB = [round(min(bestA["r"], 3.0), 1)] * n
+        else:
+            radiiB = optimize_perstore(city, D, w, n, xs, ys, bestA["r"])
         covA, canA = stats_from_radii(D, w, [bestA["r"]] * n)
         covB, canB = stats_from_radii(D, w, radiiB)
         avg_rB = sum(radiiB) / n

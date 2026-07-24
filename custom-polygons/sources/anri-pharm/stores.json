@@ -17,7 +17,7 @@
   "lon": 30.601963,
   "provider_id": 892722,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, Драгомирова 19-А, Липки-4 (Андрія Верхогляда)",
@@ -77,7 +77,7 @@
   "lon": 30.319981,
   "provider_id": 772725,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул Антоновича, 93",
@@ -147,7 +147,7 @@
   "lon": 30.478845,
   "provider_id": 472722,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. В. Чорновола 26/2А",
@@ -157,7 +157,7 @@
   "lon": 30.483305,
   "provider_id": 742738,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Гмирі, 18",
@@ -187,7 +187,7 @@
   "lon": 30.500416,
   "provider_id": 622759,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Закревського, 95В",
@@ -237,7 +237,7 @@
   "lon": 30.526289,
   "provider_id": 562711,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Максимовича Михайла,24-Б, прим. 71 н",
@@ -447,7 +447,7 @@
   "lon": 30.485678,
   "provider_id": 742739,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, м. Вишгород,Кургузова,1-А,корп.3 (Вышгород-1)",
@@ -487,7 +487,7 @@
   "lon": 30.45704,
   "provider_id": 862737,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, с. Гатне, вул. Одеська, 2",
@@ -497,7 +497,7 @@
   "lon": 30.424016,
   "provider_id": 802731,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, с. Крюківщина, вул. Жулянська, 2а, ЖК\"Євромісто\"",
@@ -587,7 +587,7 @@
   "lon": 24.027125,
   "provider_id": 442714,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, Кульпарківська, 230А (duplicate of 203459)",
@@ -617,7 +617,7 @@
   "lon": 24.01312,
   "provider_id": 862732,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул Франка,39",
@@ -627,7 +627,7 @@
   "lon": 24.034276,
   "provider_id": 472709,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул. Малоголосківська, буд. 40a",
@@ -637,7 +637,7 @@
   "lon": 23.999385,
   "provider_id": 682721,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  },
  {
   "name": "ANRI-PHARM, вул.І.Франка, 13",
@@ -647,6 +647,6 @@
   "lon": 24.035152,
   "provider_id": 562705,
   "status": "active",
-  "group_name": null
+  "group_name": "ANRI-PHARM"
  }
 ]
