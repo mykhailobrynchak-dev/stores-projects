@@ -742,6 +742,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <div class="main">
     <div id="map"></div>
     <div class="side">
+      <div id="recoBanner" style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:10px;background:rgba(52,209,134,.12);border:1px solid #34D186;color:#d6f5e6;font-size:12.5px;line-height:1.6"></div>
       <div class="card">
         <h3>How to edit</h3>
         <div class="note">Grab the <b style="color:var(--txt)">white handle</b> on a circle's edge (or the circle outline) and drag in/out to set that store's radius. Metrics below update instantly. Click a pin to see its numbers.</div>
@@ -1096,6 +1097,12 @@ document.getElementById('dlAll').onclick=()=>downloadCSV(null);
 document.getElementById('hdrSub').textContent=
   `${cityNames.reduce((s,c)=>s+DATA.cities[c].stores.length,0)} stores · ${cityNames.length} cities · CPO €${M.cpo_a.toFixed(2)} + €${M.cpo_b.toFixed(2)}/km drop-off`;
 if(!window.RESID_DATA) document.getElementById('residNote').innerHTML='resid_data.js not found — metrics use a service-area grid instead.';
+
+if(DATA.recommendation&&DATA.recommendation.banner){
+  const bn=document.getElementById('recoBanner'); bn.innerHTML=DATA.recommendation.banner; bn.style.display='block';
+  const opt=document.querySelector('#baseSel option[value="'+(DATA.recommendation.strategy||'B')+'"]');
+  if(opt) opt.textContent='Резильєнтна — рекомендовано';
+}
 
 buildTabs();
 draw();

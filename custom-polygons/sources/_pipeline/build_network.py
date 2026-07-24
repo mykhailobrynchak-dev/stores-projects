@@ -413,6 +413,8 @@ def main():
                            "curve": country_curve},
         "cities": out_cities,
     }
+    if PARAMS.get("recommend"):
+        result["recommendation"] = PARAMS["recommend"]
     (NET_DIR / "store_data.js").write_text(
         "window.STORE_DATA = " + json.dumps(result, ensure_ascii=False) + ";\n",
         encoding="utf-8")

@@ -761,6 +761,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div id="map"></div>
     <div id="tableView"></div>
     <div class="side">
+      <div id="recoBanner" style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:10px;background:rgba(52,209,134,.12);border:1px solid #34D186;color:#d6f5e6;font-size:12.5px;line-height:1.6"></div>
       <div class="card">
         <h3>Radius strategy</h3>
         <div class="seg" id="modeSeg">
@@ -1074,7 +1075,8 @@ function setMode(m){
   state.mode=m;
   document.querySelectorAll('#modeSeg button').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));
   document.getElementById('uniformCard').style.display=m==='A'?'block':'none';
-  document.getElementById('modeDesc').innerHTML={
+  const RECO=DATA.recommendation;
+  document.getElementById('modeDesc').innerHTML=(RECO&&RECO.descs&&RECO.descs[m])?RECO.descs[m]:{
     A:`<b>Option 1 — Unified per city.</b> Every store in the city shares one radius, auto-tuned to the best coverage/cannibalization/CPO balance. Drag the slider to explore.`,
     B:`<b>Option 2 — Per-store.</b> Each store's radius is optimised to cover nearby <b>residential</b> demand — it grows to fill blind spots, stops at empty land, and shrinks where neighbours already cover the area (dense clusters get smaller radii). Capped ${M.ps_rmin}–${M.ps_rmax} km.`,
     C:`<b>One country radius.</b> A single value (${DATA.countryUnified.radius} km) applied to all stores nationwide — simplest to operate.`
@@ -1140,12 +1142,21 @@ document.getElementById('hdrSub').textContent=
 
 (function(){const h=new URLSearchParams(location.hash.slice(1));
   if(h.get('city')&&DATA.cities[h.get('city')])state.city=h.get('city');
+  const RECO=DATA.recommendation;
+  if(RECO){
+    if(RECO.banner){ const bn=document.getElementById('recoBanner'); bn.innerHTML=RECO.banner; bn.style.display='block'; }
+    document.querySelectorAll('#modeSeg button').forEach(b=>{
+      const m=b.dataset.mode;
+      if(RECO.labels&&RECO.labels[m]) b.innerHTML=RECO.labels[m];
+      if(m===RECO.strategy){ b.style.borderColor='#34D186'; b.style.boxShadow='0 0 0 1px #34D186 inset'; }
+    });
+  }
   buildTabs();
   aS.value=state.alpha;bS.value=state.beta;
   document.getElementById('aVal').textContent=state.alpha.toFixed(2);
   document.getElementById('bVal').textContent=state.beta.toFixed(2);
   if(h.get('resid')==='1'){ document.getElementById('residChk').checked=true; toggleResid(true); }
-  setMode(h.get('mode')||'A');
+  setMode(h.get('mode')||(RECO&&RECO.strategy)||'A');
   setView(h.get('view')||'map');
 })();
 </script>
