@@ -943,7 +943,7 @@ function drawResidential(){
   if(!state.resid || !window.RESID_DATA) return;
   const polys=window.RESID_DATA[state.city]||[];
   polys.forEach(ring=>{
-    L.polygon(ring,{stroke:false,fillColor:'#508cff',fillOpacity:0.18,interactive:false}).addTo(residLayer);
+    L.polygon(ring,{stroke:true,color:'#3fa9ff',weight:1.3,opacity:0.9,fillColor:'#508cff',fillOpacity:0.08,interactive:false}).addTo(residLayer);
   });
 }
 
@@ -1163,7 +1163,9 @@ document.getElementById('hdrSub').textContent=
   aS.value=state.alpha;bS.value=state.beta;
   document.getElementById('aVal').textContent=state.alpha.toFixed(2);
   document.getElementById('bVal').textContent=state.beta.toFixed(2);
-  if(h.get('resid')==='1'){ document.getElementById('residChk').checked=true; toggleResid(true); }
+  // Show the Bolt delivery zone by default (unless explicitly disabled via #resid=0).
+  const showZone = h.get('resid')!=='0';
+  document.getElementById('residChk').checked=showZone; state.resid=showZone;
   setMode(h.get('mode')||(RECO&&RECO.strategy)||'A');
   setView(h.get('view')||'map');
 })();
