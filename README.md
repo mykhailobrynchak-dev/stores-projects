@@ -51,5 +51,10 @@ Folder [`custom-polygons/`](custom-polygons/):
 - `*-radius-map.html`, `*-manual-editor.html` — the shareable maps per network.
 - `final-radii/` — the **final applied radii per store** (with Provider ID) for FORA,
   ANRI-PHARM and TAISTRA.
+- [`radius-impact-report.html`](https://mykhailobrynchak-dev.github.io/stores-projects/custom-polygons/radius-impact-report.html)
+  — **before/after impact analysis** of the radius changes on ANRI-PHARM and TAISTRA:
+  orders, GMV, CPO, client↔store distance, Eater fees (Service / Small Order / Delivery),
+  delivery time and late-rate, broken down by network and city. Compares radius regime
+  **A (24–30.07)** vs the wider **B (30.07 → current)**, normalised per day.
 - `sources/` — the reproducible pipeline (`_pipeline/`: fetch data & Bolt zones, build,
   render) plus per-network inputs/outputs (`stores.json`, `econ.json`, Bolt zones, etc.).

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вплив радіусів доставки — режим A (24–30.07) vs B (30.07→)</title>
+<style>
+  :root{--primary:#34D186;--primary-d:#28a86a;--dark:#1A1A2E;--bg:#F8F9FA;--card:#fff;
+    --border:#E5E8EC;--text:#1A1A2E;--muted:#6B7280;--pos:#1f9d57;--neg:#c0392b;--warn:#B26A16;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+  header{background:var(--dark);color:#fff;padding:26px 32px}
+  header h1{margin:0 0 6px;font-size:22px}header h1 span{color:var(--primary)}
+  header .sub{color:#B8BCC8;font-size:13px}
+  .wrap{max-width:1120px;margin:0 auto;padding:24px 32px 64px}
+  h2{font-size:17px;margin:28px 0 10px}h3{font-size:14px;margin:16px 0 8px}
+  .periods{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}
+  .pchip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12.5px;flex:1;min-width:240px}
+  .pchip b{display:block;font-size:13px;margin-bottom:2px}
+  .pchip.a{border-left:4px solid #9aa4b2}.pchip.b{border-left:4px solid var(--primary)}
+  .callout{border-radius:12px;padding:16px 18px;margin:16px 0;font-size:13.5px;line-height:1.65}
+  .callout.good{background:#ECF8F1;border:1px solid #b7e6cd;color:#175c38}
+  .callout.info{background:#EEF6FF;border:1px solid #CFE3FA;color:#274b6d}
+  .callout.warn{background:#FDF3E7;border:1px solid #f2d9b3;color:#6b451a}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:13px}
+  th,td{padding:8px 11px;text-align:right;border-bottom:1px solid var(--border)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{background:#f2f4f7;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.02em}
+  tbody tr:last-child td{border-bottom:none}
+  .up{color:var(--pos)}.down{color:var(--neg)}.flat{color:var(--muted)}
+  .m{color:var(--muted);font-weight:400;font-size:11px}
+  .netcap{font-weight:700;font-size:15px;margin:22px 0 8px;color:var(--dark)}
+  .chart{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin:10px 0}
+  .bars{display:flex;align-items:flex-end;gap:18px;height:170px;padding:12px 6px 0}
+  .bucket{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
+  .pair{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:7px;width:100%}
+  .bar{width:26px;border-radius:4px 4px 0 0;position:relative}
+  .bar span{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10.5px;font-weight:600;color:var(--muted)}
+  .bar.a{background:#9aa4b2}.bar.b{background:var(--primary)}
+  .blab{font-size:11.5px;color:var(--muted);margin-top:6px}
+  .legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:middle}
+  .muted{color:var(--muted);font-size:12px}
+  ul{margin:8px 0;padding-left:20px}li{margin:4px 0}
+  code{background:#eef0f3;padding:1px 5px;border-radius:4px;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1><span>Bolt</span> · Вплив радіусів доставки: режим A vs B</h1>
+  <div class="sub">Порівняння двох режимів кастомних радіусів для ANRI-PHARM та TAISTRA · джерело: Databricks <code style="color:#cfe">main.ng_delivery</code> (delivered)</div>
+</header>
+<div class="wrap">
+
+  <div class="periods">
+    <div class="pchip a"><b>Режим A · 24–29.07.2026</b>Менші радіуси · 6 днів</div>
+    <div class="pchip b"><b>Режим B · 30.07–30.08.2026 (діє зараз)</b>Радіуси більші на +20–40% · 32 дні</div>
+  </div>
+  <div class="muted">Режим B = розширені радіуси (ANRI Київ +24%, Львів +25%; TAISTRA Чернівці +41%, Хмельницький +40%, Тернопіль +40%, І-Франківськ +12%; Луцьк вимкнено). Періоди різної довжини, тож обсяг і GMV показані <b>на день</b>; чек, дистанція, CPO, fees — середні на замовлення. Δ = B проти A.</div>
+
+  <div class="callout good">
+    <b>Головне: розширення радіусів (B) дало приріст.</b> У перерахунку на день ANRI <b>+19% замовлень</b> і <b>+26% GMV</b>, TAISTRA <b>+21%</b> і <b>+23% GMV</b>, при цьому CPO лишився під контролем (TAISTRA навіть −5%). Дальні замовлення (3–4 та 4+ км) повернулись. Найсильніший ефект — <b>ANRI Львів</b> (+133% GMV/день) і <b>TAISTRA Хмельницький</b> (+54%).
+  </div>
+  <div class="callout warn">
+    <b>Застереження.</b> Період A — лише 6 днів (кінець липня), B — 32 дні (серпень). Попри нормування на день, лишається сезонність (серпень vs липень) і різна стабільність вибірок. Один сегмент просів — <b>TAISTRA Івано-Франківськ</b> (−12% GMV/день). Для остаточних висновків корисно порівняти однакові календарні вікна рік-до-року.
+  </div>
+
+  <h2>Показники по мережах</h2>
+  <div id="tables"></div>
+
+  <h2>Розподіл замовлень за дистанцією (delivered, на день)</h2>
+  <div class="muted">Показано середню кількість замовлень у кожному кільці <b>на день</b> (A — 6 днів, B — 32). Ширші радіуси в B наростили середні й дальні кільця.</div>
+  <div id="dist-anri" class="chart"></div>
+  <div id="dist-taistra" class="chart"></div>
+
+  <h2>По містах (на день, A vs B)</h2>
+  <div id="cities"></div>
+  <div class="muted" style="margin-top:6px">Δрадіус — зміна середнього радіуса міста A→B. ANRI Київ включає приміські стори (Ірпінь/Бровари/Вишгород — у БД позначені як Київ).</div>
+
+  <h2>Висновки та наступні кроки</h2>
+  <div class="callout info">
+    <ul>
+      <li><b>Ширші радіуси (B) окупились</b> — більше замовлень, GMV і охоплення при контрольованому CPO. Це підтверджує, що вузькі радіуси A недооцінювали покриття (зокрема через дорожню дистанцію Болта проти прямої на картах).</li>
+      <li><b>Точкова увага — TAISTRA Івано-Франківськ</b>: єдиний сегмент із падінням на день; перевірити локальні причини (конкуренція, наявність кур'єрів, склад асортименту), бо радіус там і так великий (~5 км).</li>
+      <li><b>Час доставки та late-rate трохи зросли в TAISTRA</b> (більші зони = довші маршрути) — тримати в полі зору; якщо ростиме, локально підрізати найдальші радіуси.</li>
+      <li>Для чистого висновку без сезонності — порівняти серпень 2026 з серпнем 2025 (або однакові тижні) по цих мережах.</li>
+    </ul>
+  </div>
+
+  <div class="muted" style="margin-top:16px">Дані delivered orders з <code>main.ng_delivery.fact_order_delivery</code> + <code>dim_provider_v2</code> · Provider-групи ANRI-PHARM, TAISTRA · згенеровано автоматично.</div>
+</div>
+
+<script>
+const DAYS={A:6,B:32};
+const NET={
+ "ANRI-PHARM":{
+  A:{delivered:105,orders_all:119,users:101,new_users:1,gmv:976.0,dropoff:2.596,cpo:2.283,service_fee:0.679,small_order_fee:0.203,delivery_fee:0.140,aov:9.30,del_min:42.7,late:23},
+  B:{delivered:664,orders_all:728,users:585,new_users:32,gmv:6531.3,dropoff:2.539,cpo:2.339,service_fee:0.714,small_order_fee:0.186,delivery_fee:0.259,aov:9.84,del_min:31.0,late:166}},
+ "TAISTRA":{
+  A:{delivered:185,orders_all:193,users:140,new_users:4,gmv:2184.2,dropoff:1.626,cpo:1.955,service_fee:0.641,small_order_fee:0.187,delivery_fee:0.411,aov:11.81,del_min:21.0,late:28},
+  B:{delivered:1196,orders_all:1271,users:501,new_users:64,gmv:14306.5,dropoff:1.679,cpo:1.863,service_fee:0.629,small_order_fee:0.172,delivery_fee:0.401,aov:11.96,del_min:25.8,late:244}}
+};
+const DIST={"ANRI-PHARM":{A:[14,30,31,15,14],B:[113,176,142,118,114]},"TAISTRA":{A:[58,72,36,12,7],B:[286,526,244,71,44]}};
+const BUCKETS=["<1 км","1–2","2–3","3–4","4+ км"];
+// net, city, radiusA, radiusB, A{d,g,r}, B{d,g,r}
+const CITY=[
+ ["ANRI-PHARM","Kyiv",3.38,4.19, 87,870.6,2.389, 511,5216.3,2.402],
+ ["ANRI-PHARM","Lviv",4.20,5.26, 18,105.4,3.587, 153,1315.0,2.998],
+ ["TAISTRA","Chernivtsi",2.13,3.00, 93,1123.4,1.341, 590,7337.8,1.381],
+ ["TAISTRA","Ivano-Frankivsk",4.60,5.17, 28,380.7,2.717, 136,1784.1,2.282],
+ ["TAISTRA","Khmelnytskyi",2.60,3.65, 47,528.3,1.541, 374,4339.0,1.780],
+ ["TAISTRA","Ternopil",4.00,5.60, 17,151.8,1.624, 96,845.7,2.322]
+];
+
+const pct=(a,b)=>(b===0)?(a===0?0:null):(a-b)/b*100;
+const dtxt=v=>v===null?'н/д':(v>0?'+':'')+v.toFixed(0)+'%';
+function cls(v,good){if(v===null||good===0)return'flat';if(Math.abs(v)<1)return'flat';return (v>0)===(good>0)?'up':'down';}
+
+const ROWS=[
+ {l:"Замовлення (delivered)",k:"delivered",mode:"perday",good:1,f:v=>v.toFixed(1)},
+ {l:"GMV, €",k:"gmv",mode:"perday",good:1,f:v=>v.toFixed(0)},
+ {l:"Унік. клієнти",k:"users",mode:"perday",good:1,f:v=>v.toFixed(1)},
+ {l:"Нові клієнти",k:"new_users",mode:"perday",good:1,f:v=>v.toFixed(1)},
+ {l:"Сер. чек (AOV), €",k:"aov",mode:"po",good:1,f:v=>v.toFixed(2)},
+ {l:"Сер. дистанція, км",k:"dropoff",mode:"po",good:0,f:v=>v.toFixed(2)},
+ {l:"CPO, €",k:"cpo",mode:"po",good:-1,f:v=>v.toFixed(3)},
+ {l:"Service Fee, €",k:"service_fee",mode:"po",good:0,f:v=>v.toFixed(3)},
+ {l:"Small Order Fee, €",k:"small_order_fee",mode:"po",good:0,f:v=>v.toFixed(3)},
+ {l:"Delivery Fee, €",k:"delivery_fee",mode:"po",good:0,f:v=>v.toFixed(3)},
+ {l:"Час доставки, хв",k:"del_min",mode:"po",good:-1,f:v=>v.toFixed(1)},
+ {l:"Late-rate (>5хв)",k:"late",mode:"rate",good:-1}
+];
+function cell(net,per,r){
+  const d=NET[net][per];
+  if(r.mode==="perday")return `${r.f(d[r.k]/DAYS[per])}<span class="m">/д (${r.f(d[r.k])})</span>`;
+  if(r.mode==="rate")return (d.late/d.delivered*100).toFixed(0)+'%';
+  return r.f(d[r.k]);
+}
+function delta(net,r){
+  const A=NET[net].A,B=NET[net].B;
+  if(r.mode==="rate"){const dd=B.late/B.delivered*100-A.late/A.delivered*100;return `<span class="${cls(dd,r.good)}">${(dd>0?'+':'')+dd.toFixed(0)} п.п.</span>`;}
+  let a=B[r.k],b=A[r.k];
+  if(r.mode==="perday"){a=a/DAYS.B;b=b/DAYS.A;}
+  const p=pct(a,b);return `<span class="${cls(p,r.good)}">${dtxt(p)}</span>`;
+}
+function netTable(net){
+  let h=`<div class="netcap">${net}</div><table><thead><tr><th>Показник</th><th>A · 24–29.07</th><th>B · 30.07–30.08</th><th>Δ B vs A</th></tr></thead><tbody>`;
+  for(const r of ROWS)h+=`<tr><td>${r.l}</td><td>${cell(net,'A',r)}</td><td>${cell(net,'B',r)}</td><td>${delta(net,r)}</td></tr>`;
+  return h+`</tbody></table>`;
+}
+document.getElementById('tables').innerHTML=netTable("ANRI-PHARM")+netTable("TAISTRA");
+
+function distChart(net){
+  const A=DIST[net].A.map(v=>v/DAYS.A),B=DIST[net].B.map(v=>v/DAYS.B),mx=Math.max(...A,...B,0.1);
+  const bars=BUCKETS.map((b,i)=>`<div class="bucket"><div class="pair">
+    <div class="bar a" style="height:${A[i]/mx*130}px"><span>${A[i].toFixed(1)}</span></div>
+    <div class="bar b" style="height:${B[i]/mx*130}px"><span>${B[i].toFixed(1)}</span></div>
+  </div><div class="blab">${b}</div></div>`).join("");
+  return `<h3>${net}</h3><div class="bars">${bars}</div>
+    <div class="legend"><span><i style="background:#9aa4b2"></i>A · менші радіуси (/день)</span><span><i style="background:#34D186"></i>B · +20–40% (/день)</span></div>`;
+}
+document.getElementById('dist-anri').innerHTML=distChart("ANRI-PHARM");
+document.getElementById('dist-taistra').innerHTML=distChart("TAISTRA");
+
+function cityTable(){
+  let h=`<table><thead><tr><th>Мережа</th><th>Місто</th><th>Δрадіус</th><th>Dlv/д A</th><th>Dlv/д B</th><th>Δ</th><th>GMV/д A</th><th>GMV/д B</th><th>Δ</th><th>Дист. A</th><th>Дист. B</th></tr></thead><tbody>`;
+  for(const [net,city,ra,rb,da,ga,ma,db,gb,mb] of CITY){
+    const dpa=da/DAYS.A,dpb=db/DAYS.B,gpa=ga/DAYS.A,gpb=gb/DAYS.B;
+    const pd=pct(dpb,dpa),pg=pct(gpb,gpa),pr=pct(rb,ra);
+    h+=`<tr><td>${net}</td><td>${city}</td><td class="flat">${dtxt(pr)}</td>
+      <td>${dpa.toFixed(1)}</td><td>${dpb.toFixed(1)}</td><td class="${cls(pd,1)}">${dtxt(pd)}</td>
+      <td>${gpa.toFixed(0)}</td><td>${gpb.toFixed(0)}</td><td class="${cls(pg,1)}">${dtxt(pg)}</td>
+      <td>${ma.toFixed(2)}</td><td>${mb.toFixed(2)}</td></tr>`;
+  }
+  return h+`</tbody></table>`;
+}
+document.getElementById('cities').innerHTML=cityTable();
+</script>
+</body>
+</html>
