@@ -52,9 +52,11 @@ Folder [`custom-polygons/`](custom-polygons/):
 - `final-radii/` — the **final applied radii per store** (with Provider ID) for FORA,
   ANRI-PHARM and TAISTRA.
 - [`radius-impact-report.html`](https://mykhailobrynchak-dev.github.io/stores-projects/custom-polygons/radius-impact-report.html)
-  — **before/after impact analysis** of the radius changes on ANRI-PHARM and TAISTRA:
-  orders, GMV, CPO, client↔store distance, Eater fees (Service / Small Order / Delivery),
-  delivery time and late-rate, broken down by network and city. Compares radius regime
-  **A (24–30.07)** vs the wider **B (30.07 → current)**, normalised per day.
+  — **impact analysis** of the radius changes on ANRI-PHARM and TAISTRA across three
+  periods — **Baseline (01.05–23.07, before changes)**, **A (24–29.07)** and the current
+  wider **B (30.07–30.08)** — focused on Baseline → B. Covers orders, GMV, CPO, client↔store
+  distance, Eater fees (Service / Small Order / Delivery), delivery time, late-rate and
+  **CP Margin %**, plus the store-level **correlation between ΔCPO and ΔCP Margin**, by
+  network and city (English).
 - `sources/` — the reproducible pipeline (`_pipeline/`: fetch data & Bolt zones, build,
   render) plus per-network inputs/outputs (`stores.json`, `econ.json`, Bolt zones, etc.).

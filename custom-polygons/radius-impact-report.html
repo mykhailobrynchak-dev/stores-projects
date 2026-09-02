@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Вплив радіусів доставки — режим A (24–30.07) vs B (30.07→)</title>
+<title>Delivery Radius Impact — Baseline vs B</title>
 <style>
   :root{--primary:#34D186;--primary-d:#28a86a;--dark:#1A1A2E;--bg:#F8F9FA;--card:#fff;
-    --border:#E5E8EC;--text:#1A1A2E;--muted:#6B7280;--pos:#1f9d57;--neg:#c0392b;--warn:#B26A16;}
+    --border:#E5E8EC;--text:#1A1A2E;--muted:#6B7280;--pos:#1f9d57;--neg:#c0392b;--warn:#B26A16;--accent2:#3fa9ff;}
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
   header{background:var(--dark);color:#fff;padding:26px 32px}
   header h1{margin:0 0 6px;font-size:22px}header h1 span{color:var(--primary)}
   header .sub{color:#B8BCC8;font-size:13px}
-  .wrap{max-width:1120px;margin:0 auto;padding:24px 32px 64px}
+  .wrap{max-width:1140px;margin:0 auto;padding:24px 32px 64px}
   h2{font-size:17px;margin:28px 0 10px}h3{font-size:14px;margin:16px 0 8px}
   .periods{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}
-  .pchip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12.5px;flex:1;min-width:240px}
+  .pchip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12.5px;flex:1;min-width:220px}
   .pchip b{display:block;font-size:13px;margin-bottom:2px}
-  .pchip.a{border-left:4px solid #9aa4b2}.pchip.b{border-left:4px solid var(--primary)}
+  .pchip.base{border-left:4px solid #9aa4b2}.pchip.a{border-left:4px solid #c9ccd1}.pchip.b{border-left:4px solid var(--primary)}
   .callout{border-radius:12px;padding:16px 18px;margin:16px 0;font-size:13.5px;line-height:1.65}
   .callout.good{background:#ECF8F1;border:1px solid #b7e6cd;color:#175c38}
   .callout.info{background:#EEF6FF;border:1px solid #CFE3FA;color:#274b6d}
@@ -27,151 +27,170 @@
   th,td{padding:8px 11px;text-align:right;border-bottom:1px solid var(--border)}
   th:first-child,td:first-child{text-align:left}
   thead th{background:#f2f4f7;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.02em}
+  thead th.hl{background:#e6f7ee;color:var(--primary-d)}
   tbody tr:last-child td{border-bottom:none}
+  td.hl{background:#f4fbf7}
   .up{color:var(--pos)}.down{color:var(--neg)}.flat{color:var(--muted)}
   .m{color:var(--muted);font-weight:400;font-size:11px}
   .netcap{font-weight:700;font-size:15px;margin:22px 0 8px;color:var(--dark)}
   .chart{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin:10px 0}
-  .bars{display:flex;align-items:flex-end;gap:18px;height:170px;padding:12px 6px 0}
-  .bucket{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
-  .pair{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:7px;width:100%}
-  .bar{width:26px;border-radius:4px 4px 0 0;position:relative}
-  .bar span{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10.5px;font-weight:600;color:var(--muted)}
-  .bar.a{background:#9aa4b2}.bar.b{background:var(--primary)}
-  .blab{font-size:11.5px;color:var(--muted);margin-top:6px}
-  .legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px}
-  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:middle}
   .muted{color:var(--muted);font-size:12px}
   ul{margin:8px 0;padding-left:20px}li{margin:4px 0}
   code{background:#eef0f3;padding:1px 5px;border-radius:4px;font-size:12px}
+  .legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:6px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .rbadge{display:inline-block;background:var(--dark);color:#fff;border-radius:8px;padding:6px 12px;font-weight:700;font-size:14px}
 </style>
 </head>
 <body>
 <header>
-  <h1><span>Bolt</span> · Вплив радіусів доставки: режим A vs B</h1>
-  <div class="sub">Порівняння двох режимів кастомних радіусів для ANRI-PHARM та TAISTRA · джерело: Databricks <code style="color:#cfe">main.ng_delivery</code> (delivered)</div>
+  <h1><span>Bolt</span> · Delivery Radius Impact — Baseline vs Current (B)</h1>
+  <div class="sub">Networks ANRI-PHARM &amp; TAISTRA · source: Databricks <code style="color:#cfe">main.ng_delivery</code> (delivered orders)</div>
 </header>
 <div class="wrap">
 
   <div class="periods">
-    <div class="pchip a"><b>Режим A · 24–29.07.2026</b>Менші радіуси · 6 днів</div>
-    <div class="pchip b"><b>Режим B · 30.07–30.08.2026 (діє зараз)</b>Радіуси більші на +20–40% · 32 дні</div>
+    <div class="pchip base"><b>Baseline · 01.05–23.07.2026</b>Before radius changes · 84 days</div>
+    <div class="pchip a"><b>A · 24–29.07.2026</b>First custom radii · 6 days</div>
+    <div class="pchip b"><b>B · 30.07–30.08.2026 (current)</b>Wider radii (+20–40%) · 32 days</div>
   </div>
-  <div class="muted">Режим B = розширені радіуси (ANRI Київ +24%, Львів +25%; TAISTRA Чернівці +41%, Хмельницький +40%, Тернопіль +40%, І-Франківськ +12%; Луцьк вимкнено). Періоди різної довжини, тож обсяг і GMV показані <b>на день</b>; чек, дистанція, CPO, fees — середні на замовлення. Δ = B проти A.</div>
+  <div class="muted">Periods differ in length, so <b>volume &amp; GMV are shown per day</b>; AOV, distance, CPO and Eater fees are per-order averages; CP Margin is a share of GMV. The report focuses on <b>Baseline → B</b> (the net effect of moving to custom, then wider, radii). <b>CP Margin %</b> = contribution profit / GMV, where contribution profit = commission + service fee + small-order fee + delivery fee − courier cost (CPO) − refunds − incentives.</div>
 
   <div class="callout good">
-    <b>Головне: розширення радіусів (B) дало приріст.</b> У перерахунку на день ANRI <b>+19% замовлень</b> і <b>+26% GMV</b>, TAISTRA <b>+21%</b> і <b>+23% GMV</b>, при цьому CPO лишився під контролем (TAISTRA навіть −5%). Дальні замовлення (3–4 та 4+ км) повернулись. Найсильніший ефект — <b>ANRI Львів</b> (+133% GMV/день) і <b>TAISTRA Хмельницький</b> (+54%).
+    <b>Headline (Baseline → B).</b> Both networks improved unit economics: <b>CPO fell</b> (ANRI €2.59→€2.34, −10%; TAISTRA €2.24→€1.86, −17%), average client–store distance dropped, and <b>CP Margin % improved</b> markedly — ANRI <b>−23.4% → −15.3%</b> (+8.1 pp), TAISTRA <b>−9.2% → −3.3%</b> (+5.9 pp). ANRI also grew strongly in volume (+65% orders/day), while TAISTRA held volume flat at higher efficiency.
   </div>
   <div class="callout warn">
-    <b>Застереження.</b> Період A — лише 6 днів (кінець липня), B — 32 дні (серпень). Попри нормування на день, лишається сезонність (серпень vs липень) і різна стабільність вибірок. Один сегмент просів — <b>TAISTRA Івано-Франківськ</b> (−12% GMV/день). Для остаточних висновків корисно порівняти однакові календарні вікна рік-до-року.
+    <b>Caveats.</b> Baseline is a long ramp-up window (May–Jul) and B is August, so seasonality and organic growth are mixed in with the radius effect (esp. for the growing ANRI network). CP Margin is a transparent reconstruction (see formula above), not the official finance figure. Contribution margin is negative across the board — delivery is subsidised (courier cost + incentives exceed commission + fees).
   </div>
 
-  <h2>Показники по мережах</h2>
+  <h2>Network metrics by period</h2>
   <div id="tables"></div>
 
-  <h2>Розподіл замовлень за дистанцією (delivered, на день)</h2>
-  <div class="muted">Показано середню кількість замовлень у кожному кільці <b>на день</b> (A — 6 днів, B — 32). Ширші радіуси в B наростили середні й дальні кільця.</div>
-  <div id="dist-anri" class="chart"></div>
-  <div id="dist-taistra" class="chart"></div>
-
-  <h2>По містах (на день, A vs B)</h2>
-  <div id="cities"></div>
-  <div class="muted" style="margin-top:6px">Δрадіус — зміна середнього радіуса міста A→B. ANRI Київ включає приміські стори (Ірпінь/Бровари/Вишгород — у БД позначені як Київ).</div>
-
-  <h2>Висновки та наступні кроки</h2>
+  <h2>CP Margin % &amp; correlation with CPO change</h2>
   <div class="callout info">
-    <ul>
-      <li><b>Ширші радіуси (B) окупились</b> — більше замовлень, GMV і охоплення при контрольованому CPO. Це підтверджує, що вузькі радіуси A недооцінювали покриття (зокрема через дорожню дистанцію Болта проти прямої на картах).</li>
-      <li><b>Точкова увага — TAISTRA Івано-Франківськ</b>: єдиний сегмент із падінням на день; перевірити локальні причини (конкуренція, наявність кур'єрів, склад асортименту), бо радіус там і так великий (~5 км).</li>
-      <li><b>Час доставки та late-rate трохи зросли в TAISTRA</b> (більші зони = довші маршрути) — тримати в полі зору; якщо ростиме, локально підрізати найдальші радіуси.</li>
-      <li>Для чистого висновку без сезонності — порівняти серпень 2026 з серпнем 2025 (або однакові тижні) по цих мережах.</li>
-    </ul>
+    At network level, <b>lower CPO coincided with better CP Margin</b> from Baseline to B. At <b>store level</b> (n=<span id="ns"></span> stores with ≥15 delivered orders in both Baseline and B), the correlation between the change in CPO and the change in CP Margin % is
+    <span class="rbadge" id="rval"></span> (Pearson). It is <b>weakly negative</b> — stores whose CPO rose tended to see slightly weaker margin gains — but weak and noisy given the small sample and campaign-driven incentive swings.
+  </div>
+  <div class="chart">
+    <h3>Store-level: Δ CPO (€) vs Δ CP Margin (pp), Baseline → B</h3>
+    <div id="scatter"></div>
+    <div class="legend"><span><i style="background:#34D186"></i>TAISTRA</span><span><i style="background:#3fa9ff"></i>ANRI-PHARM</span><span>· dashed lines = zero (no change)</span></div>
   </div>
 
-  <div class="muted" style="margin-top:16px">Дані delivered orders з <code>main.ng_delivery.fact_order_delivery</code> + <code>dim_provider_v2</code> · Provider-групи ANRI-PHARM, TAISTRA · згенеровано автоматично.</div>
+  <h2>By city — Baseline vs B</h2>
+  <div id="cities"></div>
+  <div class="muted" style="margin-top:6px">Per-day volume; CPO &amp; CP Margin as above. ANRI "Kyiv" includes suburban stores (Irpin/Brovary/Vyshhorod are labelled Kyiv in the source). Ternopil CP Margin worsened on a small sample — flagged below.</div>
+
+  <h2>Takeaways</h2>
+  <div class="callout info">
+    <ul>
+      <li><b>The radius programme did not hurt unit economics</b> — from Baseline to current (B), CPO and delivery distance fell and CP Margin improved for both networks, while ANRI scaled volume.</li>
+      <li><b>CPO ↔ CP Margin link is weak at store level</b> (r=<span id="rval2"></span>): margin is dominated by incentives and commission mix, not just courier cost. Managing incentive spend matters as much as radius/CPO.</li>
+      <li><b>Watch-outs:</b> TAISTRA <b>Ternopil</b> CP Margin dropped (small sample, +radius) and TAISTRA late-rate ticked up — review locally. Contribution margin remains negative everywhere; improving commission/fees or trimming incentives is needed to reach breakeven.</li>
+      <li><b>For a clean read</b> free of seasonality/ramp, compare like-for-like calendar windows (e.g., Aug-2026 vs Aug-2025) once more history accrues.</li>
+    </ul>
+  </div>
+  <div class="muted" style="margin-top:16px">Delivered orders from <code>main.ng_delivery.fact_order_delivery</code> + <code>dim_provider_v2</code> · generated automatically.</div>
 </div>
 
 <script>
-const DAYS={A:6,B:32};
+const DAYS={BASE:84,A:6,B:32};
 const NET={
  "ANRI-PHARM":{
-  A:{delivered:105,orders_all:119,users:101,new_users:1,gmv:976.0,dropoff:2.596,cpo:2.283,service_fee:0.679,small_order_fee:0.203,delivery_fee:0.140,aov:9.30,del_min:42.7,late:23},
-  B:{delivered:664,orders_all:728,users:585,new_users:32,gmv:6531.3,dropoff:2.539,cpo:2.339,service_fee:0.714,small_order_fee:0.186,delivery_fee:0.259,aov:9.84,del_min:31.0,late:166}},
+  BASE:{delivered:1055,users:1031,new_users:55,gmv:9889.3,dropoff:3.630,cpo:2.593,service_fee:0.702,small_order_fee:0.182,delivery_fee:0.168,aov:9.37,del_min:38.3,late:287,cm_sum:-2314.08,gmv_sum:9889.34},
+  A:{delivered:105,users:101,new_users:1,gmv:976.0,dropoff:2.596,cpo:2.283,service_fee:0.679,small_order_fee:0.203,delivery_fee:0.140,aov:9.30,del_min:42.7,late:23,cm_sum:-172.64,gmv_sum:976.02},
+  B:{delivered:664,users:585,new_users:32,gmv:6531.3,dropoff:2.539,cpo:2.339,service_fee:0.714,small_order_fee:0.186,delivery_fee:0.259,aov:9.84,del_min:31.0,late:166,cm_sum:-999.78,gmv_sum:6531.29}},
  "TAISTRA":{
-  A:{delivered:185,orders_all:193,users:140,new_users:4,gmv:2184.2,dropoff:1.626,cpo:1.955,service_fee:0.641,small_order_fee:0.187,delivery_fee:0.411,aov:11.81,del_min:21.0,late:28},
-  B:{delivered:1196,orders_all:1271,users:501,new_users:64,gmv:14306.5,dropoff:1.679,cpo:1.863,service_fee:0.629,small_order_fee:0.172,delivery_fee:0.401,aov:11.96,del_min:25.8,late:244}}
+  BASE:{delivered:3148,users:923,new_users:126,gmv:38702.4,dropoff:2.417,cpo:2.239,service_fee:0.627,small_order_fee:0.163,delivery_fee:0.322,aov:12.29,del_min:26.7,late:621,cm_sum:-3555.49,gmv_sum:38702.39},
+  A:{delivered:185,users:140,new_users:4,gmv:2184.2,dropoff:1.626,cpo:1.955,service_fee:0.641,small_order_fee:0.187,delivery_fee:0.411,aov:11.81,del_min:21.0,late:28,cm_sum:-53.6,gmv_sum:2184.25},
+  B:{delivered:1196,users:501,new_users:64,gmv:14306.5,dropoff:1.679,cpo:1.863,service_fee:0.629,small_order_fee:0.172,delivery_fee:0.401,aov:11.96,del_min:25.8,late:244,cm_sum:-472.43,gmv_sum:14306.55}}
 };
-const DIST={"ANRI-PHARM":{A:[14,30,31,15,14],B:[113,176,142,118,114]},"TAISTRA":{A:[58,72,36,12,7],B:[286,526,244,71,44]}};
-const BUCKETS=["<1 км","1–2","2–3","3–4","4+ км"];
-// net, city, radiusA, radiusB, A{d,g,r}, B{d,g,r}
+// net, city, per {delivered,gmv,dropoff,cpo,cm_sum,gmv_sum} for BASE and B
 const CITY=[
- ["ANRI-PHARM","Kyiv",3.38,4.19, 87,870.6,2.389, 511,5216.3,2.402],
- ["ANRI-PHARM","Lviv",4.20,5.26, 18,105.4,3.587, 153,1315.0,2.998],
- ["TAISTRA","Chernivtsi",2.13,3.00, 93,1123.4,1.341, 590,7337.8,1.381],
- ["TAISTRA","Ivano-Frankivsk",4.60,5.17, 28,380.7,2.717, 136,1784.1,2.282],
- ["TAISTRA","Khmelnytskyi",2.60,3.65, 47,528.3,1.541, 374,4339.0,1.780],
- ["TAISTRA","Ternopil",4.00,5.60, 17,151.8,1.624, 96,845.7,2.322]
+ ["ANRI-PHARM","Kyiv",{d:888,g:8451.1,r:3.335,cpo:2.546,cm:-1782.69,gm:8451.12},{d:511,g:5216.3,r:2.402,cpo:2.33,cm:-653.99,gm:5216.28}],
+ ["ANRI-PHARM","Lviv",{d:167,g:1438.2,r:5.198,cpo:2.839,cm:-531.4,gm:1438.22},{d:153,g:1315.0,r:2.998,cpo:2.368,cm:-345.79,gm:1315.01}],
+ ["TAISTRA","Chernivtsi",{d:1850,g:23250.7,r:2.300,cpo:2.258,cm:-2252.15,gm:23250.69},{d:590,g:7337.8,r:1.381,cpo:1.813,cm:-136.07,gm:7337.79}],
+ ["TAISTRA","Ivano-Frankivsk",{d:465,g:6015.5,r:2.942,cpo:2.349,cm:-324.31,gm:6015.46},{d:136,g:1784.1,r:2.282,cpo:2.249,cm:-0.83,gm:1784.14}],
+ ["TAISTRA","Khmelnytskyi",{d:723,g:8102.4,r:2.322,cpo:2.147,cm:-910.76,gm:8102.36},{d:374,g:4339.0,r:1.780,cpo:1.791,cm:-90.59,gm:4338.95}],
+ ["TAISTRA","Ternopil",{d:110,g:1333.9,r:2.785,cpo:2.068,cm:-68.27,gm:1333.88},{d:96,g:845.7,r:2.322,cpo:1.908,cm:-244.94,gm:845.67}]
 ];
+const CORR=[{"pid":203432,"gn":"ANRI-PHARM","dCPO":0.153,"dCPM":3.8},{"pid":164283,"gn":"TAISTRA","dCPO":-0.32,"dCPM":11.5},{"pid":193395,"gn":"TAISTRA","dCPO":-0.384,"dCPM":13.3},{"pid":203459,"gn":"ANRI-PHARM","dCPO":-0.307,"dCPM":3.9},{"pid":153567,"gn":"TAISTRA","dCPO":-0.415,"dCPM":10.8},{"pid":164329,"gn":"TAISTRA","dCPO":-0.031,"dCPM":3.6},{"pid":198369,"gn":"TAISTRA","dCPO":-0.154,"dCPM":3.9},{"pid":199390,"gn":"TAISTRA","dCPO":-0.174,"dCPM":4.1},{"pid":203431,"gn":"ANRI-PHARM","dCPO":-0.129,"dCPM":1.8},{"pid":164340,"gn":"TAISTRA","dCPO":-0.458,"dCPM":-40.3},{"pid":203421,"gn":"ANRI-PHARM","dCPO":-0.054,"dCPM":2.8},{"pid":203426,"gn":"ANRI-PHARM","dCPO":0.112,"dCPM":8.3},{"pid":175229,"gn":"TAISTRA","dCPO":-0.328,"dCPM":6.7},{"pid":203429,"gn":"ANRI-PHARM","dCPO":0.055,"dCPM":-4.6},{"pid":164334,"gn":"TAISTRA","dCPO":-0.207,"dCPM":3.3},{"pid":203419,"gn":"ANRI-PHARM","dCPO":-0.224,"dCPM":16.3},{"pid":175689,"gn":"TAISTRA","dCPO":-0.099,"dCPM":9.4},{"pid":203396,"gn":"ANRI-PHARM","dCPO":-0.513,"dCPM":15.6},{"pid":198370,"gn":"TAISTRA","dCPO":0.44,"dCPM":-7.9},{"pid":164337,"gn":"TAISTRA","dCPO":-0.41,"dCPM":8.6},{"pid":174008,"gn":"TAISTRA","dCPO":0.113,"dCPM":-0.6},{"pid":203395,"gn":"ANRI-PHARM","dCPO":-0.144,"dCPM":4.7}];
+const R_VAL=-0.13;
 
-const pct=(a,b)=>(b===0)?(a===0?0:null):(a-b)/b*100;
-const dtxt=v=>v===null?'н/д':(v>0?'+':'')+v.toFixed(0)+'%';
+const pct=(a,b)=>(b===0)?null:(a-b)/b*100;
+const dtxt=v=>v===null?'n/a':(v>0?'+':'')+v.toFixed(0)+'%';
+const cpm=o=>o.gmv_sum?100*o.cm_sum/o.gmv_sum:null;
 function cls(v,good){if(v===null||good===0)return'flat';if(Math.abs(v)<1)return'flat';return (v>0)===(good>0)?'up':'down';}
 
 const ROWS=[
- {l:"Замовлення (delivered)",k:"delivered",mode:"perday",good:1,f:v=>v.toFixed(1)},
+ {l:"Delivered orders",k:"delivered",mode:"perday",good:1,f:v=>v.toFixed(1)},
  {l:"GMV, €",k:"gmv",mode:"perday",good:1,f:v=>v.toFixed(0)},
- {l:"Унік. клієнти",k:"users",mode:"perday",good:1,f:v=>v.toFixed(1)},
- {l:"Нові клієнти",k:"new_users",mode:"perday",good:1,f:v=>v.toFixed(1)},
- {l:"Сер. чек (AOV), €",k:"aov",mode:"po",good:1,f:v=>v.toFixed(2)},
- {l:"Сер. дистанція, км",k:"dropoff",mode:"po",good:0,f:v=>v.toFixed(2)},
+ {l:"Unique customers",k:"users",mode:"perday",good:1,f:v=>v.toFixed(1)},
+ {l:"New customers",k:"new_users",mode:"perday",good:1,f:v=>v.toFixed(1)},
+ {l:"AOV, €",k:"aov",mode:"po",good:1,f:v=>v.toFixed(2)},
+ {l:"Client–store distance, km",k:"dropoff",mode:"po",good:0,f:v=>v.toFixed(2)},
  {l:"CPO, €",k:"cpo",mode:"po",good:-1,f:v=>v.toFixed(3)},
+ {l:"CP Margin, %",k:"cpm",mode:"cpm",good:1},
  {l:"Service Fee, €",k:"service_fee",mode:"po",good:0,f:v=>v.toFixed(3)},
  {l:"Small Order Fee, €",k:"small_order_fee",mode:"po",good:0,f:v=>v.toFixed(3)},
  {l:"Delivery Fee, €",k:"delivery_fee",mode:"po",good:0,f:v=>v.toFixed(3)},
- {l:"Час доставки, хв",k:"del_min",mode:"po",good:-1,f:v=>v.toFixed(1)},
- {l:"Late-rate (>5хв)",k:"late",mode:"rate",good:-1}
+ {l:"Delivery time, min",k:"del_min",mode:"po",good:-1,f:v=>v.toFixed(1)},
+ {l:"Late-rate (>5 min)",k:"late",mode:"rate",good:-1}
 ];
-function cell(net,per,r){
+function cellVal(net,per,r){
   const d=NET[net][per];
-  if(r.mode==="perday")return `${r.f(d[r.k]/DAYS[per])}<span class="m">/д (${r.f(d[r.k])})</span>`;
+  if(r.mode==="perday")return `${r.f(d[r.k]/DAYS[per])}<span class="m">/d</span>`;
   if(r.mode==="rate")return (d.late/d.delivered*100).toFixed(0)+'%';
+  if(r.mode==="cpm"){const v=cpm(d);return v.toFixed(1)+'%';}
   return r.f(d[r.k]);
 }
-function delta(net,r){
-  const A=NET[net].A,B=NET[net].B;
-  if(r.mode==="rate"){const dd=B.late/B.delivered*100-A.late/A.delivered*100;return `<span class="${cls(dd,r.good)}">${(dd>0?'+':'')+dd.toFixed(0)} п.п.</span>`;}
-  let a=B[r.k],b=A[r.k];
-  if(r.mode==="perday"){a=a/DAYS.B;b=b/DAYS.A;}
+function deltaBvsBase(net,r){
+  const A=NET[net].B, Bx=NET[net].BASE;
+  if(r.mode==="rate"){const dd=A.late/A.delivered*100 - Bx.late/Bx.delivered*100;return `<span class="${cls(dd,r.good)}">${(dd>0?'+':'')+dd.toFixed(0)} pp</span>`;}
+  if(r.mode==="cpm"){const dd=cpm(A)-cpm(Bx);return `<span class="${cls(dd,r.good)}">${(dd>0?'+':'')+dd.toFixed(1)} pp</span>`;}
+  let a=A[r.k],b=Bx[r.k];
+  if(r.mode==="perday"){a/=DAYS.B;b/=DAYS.BASE;}
   const p=pct(a,b);return `<span class="${cls(p,r.good)}">${dtxt(p)}</span>`;
 }
 function netTable(net){
-  let h=`<div class="netcap">${net}</div><table><thead><tr><th>Показник</th><th>A · 24–29.07</th><th>B · 30.07–30.08</th><th>Δ B vs A</th></tr></thead><tbody>`;
-  for(const r of ROWS)h+=`<tr><td>${r.l}</td><td>${cell(net,'A',r)}</td><td>${cell(net,'B',r)}</td><td>${delta(net,r)}</td></tr>`;
+  let h=`<div class="netcap">${net}</div><table><thead><tr><th>Metric</th><th>Baseline</th><th>A</th><th class="hl">B (current)</th><th class="hl">Δ B vs Baseline</th></tr></thead><tbody>`;
+  for(const r of ROWS)h+=`<tr><td>${r.l}</td><td>${cellVal(net,'BASE',r)}</td><td>${cellVal(net,'A',r)}</td><td class="hl">${cellVal(net,'B',r)}</td><td class="hl">${deltaBvsBase(net,r)}</td></tr>`;
   return h+`</tbody></table>`;
 }
 document.getElementById('tables').innerHTML=netTable("ANRI-PHARM")+netTable("TAISTRA");
 
-function distChart(net){
-  const A=DIST[net].A.map(v=>v/DAYS.A),B=DIST[net].B.map(v=>v/DAYS.B),mx=Math.max(...A,...B,0.1);
-  const bars=BUCKETS.map((b,i)=>`<div class="bucket"><div class="pair">
-    <div class="bar a" style="height:${A[i]/mx*130}px"><span>${A[i].toFixed(1)}</span></div>
-    <div class="bar b" style="height:${B[i]/mx*130}px"><span>${B[i].toFixed(1)}</span></div>
-  </div><div class="blab">${b}</div></div>`).join("");
-  return `<h3>${net}</h3><div class="bars">${bars}</div>
-    <div class="legend"><span><i style="background:#9aa4b2"></i>A · менші радіуси (/день)</span><span><i style="background:#34D186"></i>B · +20–40% (/день)</span></div>`;
-}
-document.getElementById('dist-anri').innerHTML=distChart("ANRI-PHARM");
-document.getElementById('dist-taistra').innerHTML=distChart("TAISTRA");
+// scatter
+(function(){
+  const W=880,H=340,pad=54;
+  const xs=CORR.map(p=>p.dCPO), ys=CORR.map(p=>p.dCPM);
+  const xmin=Math.min(...xs,-0.05),xmax=Math.max(...xs,0.05),ymin=Math.min(...ys),ymax=Math.max(...ys);
+  const X=v=>pad+(v-xmin)/(xmax-xmin)*(W-2*pad);
+  const Y=v=>H-pad-(v-ymin)/(ymax-ymin)*(H-2*pad);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px">`;
+  s+=`<line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#ccc"/><line x1="${pad}" y1="${pad}" x2="${pad}" y2="${H-pad}" stroke="#ccc"/>`;
+  if(xmin<0&&xmax>0){s+=`<line x1="${X(0)}" y1="${pad}" x2="${X(0)}" y2="${H-pad}" stroke="#bbb" stroke-dasharray="4 3"/>`;}
+  if(ymin<0&&ymax>0){s+=`<line x1="${pad}" y1="${Y(0)}" x2="${W-pad}" y2="${Y(0)}" stroke="#bbb" stroke-dasharray="4 3"/>`;}
+  for(const p of CORR){const col=p.gn==="TAISTRA"?"#34D186":"#3fa9ff";s+=`<circle cx="${X(p.dCPO).toFixed(1)}" cy="${Y(p.dCPM).toFixed(1)}" r="5" fill="${col}" fill-opacity="0.75" stroke="#fff"/>`;}
+  s+=`<text x="${W/2}" y="${H-14}" text-anchor="middle" font-size="12" fill="#6B7280">Δ CPO, € (B − Baseline) — right = CPO increased</text>`;
+  s+=`<text x="16" y="${H/2}" text-anchor="middle" font-size="12" fill="#6B7280" transform="rotate(-90 16 ${H/2})">Δ CP Margin, pp — up = margin improved</text>`;
+  s+=`<text x="${W-pad}" y="${pad-8}" text-anchor="end" font-size="12" fill="#1A1A2E">Pearson r = ${R_VAL}</text>`;
+  s+=`</svg>`;
+  document.getElementById('scatter').innerHTML=s;
+})();
+document.getElementById('ns').textContent=CORR.length;
+document.getElementById('rval').textContent="r = "+R_VAL;
+document.getElementById('rval2').textContent=R_VAL;
 
 function cityTable(){
-  let h=`<table><thead><tr><th>Мережа</th><th>Місто</th><th>Δрадіус</th><th>Dlv/д A</th><th>Dlv/д B</th><th>Δ</th><th>GMV/д A</th><th>GMV/д B</th><th>Δ</th><th>Дист. A</th><th>Дист. B</th></tr></thead><tbody>`;
-  for(const [net,city,ra,rb,da,ga,ma,db,gb,mb] of CITY){
-    const dpa=da/DAYS.A,dpb=db/DAYS.B,gpa=ga/DAYS.A,gpb=gb/DAYS.B;
-    const pd=pct(dpb,dpa),pg=pct(gpb,gpa),pr=pct(rb,ra);
-    h+=`<tr><td>${net}</td><td>${city}</td><td class="flat">${dtxt(pr)}</td>
-      <td>${dpa.toFixed(1)}</td><td>${dpb.toFixed(1)}</td><td class="${cls(pd,1)}">${dtxt(pd)}</td>
-      <td>${gpa.toFixed(0)}</td><td>${gpb.toFixed(0)}</td><td class="${cls(pg,1)}">${dtxt(pg)}</td>
-      <td>${ma.toFixed(2)}</td><td>${mb.toFixed(2)}</td></tr>`;
+  let h=`<table><thead><tr><th>Network</th><th>City</th><th>Deliv/d Base</th><th class="hl">Deliv/d B</th><th>Δ</th><th>GMV/d Base</th><th class="hl">GMV/d B</th><th>Δ</th><th>CPO Base</th><th class="hl">CPO B</th><th>CP Marg% Base</th><th class="hl">CP Marg% B</th></tr></thead><tbody>`;
+  for(const [net,city,BA,B] of CITY){
+    const dpb=BA.d/DAYS.BASE,dpB=B.d/DAYS.B,gpb=BA.g/DAYS.BASE,gpB=B.g/DAYS.B;
+    const pd=pct(dpB,dpb),pg=pct(gpB,gpb);
+    const cmb=100*BA.cm/BA.gm,cmB=100*B.cm/B.gm;
+    h+=`<tr><td>${net}</td><td>${city}</td><td>${dpb.toFixed(1)}</td><td class="hl">${dpB.toFixed(1)}</td><td class="${cls(pd,1)}">${dtxt(pd)}</td>
+      <td>${gpb.toFixed(0)}</td><td class="hl">${gpB.toFixed(0)}</td><td class="${cls(pg,1)}">${dtxt(pg)}</td>
+      <td>${BA.cpo.toFixed(2)}</td><td class="hl">${B.cpo.toFixed(2)}</td>
+      <td>${cmb.toFixed(1)}%</td><td class="hl ${cls(cmB-cmb,1)}">${cmB.toFixed(1)}%</td></tr>`;
   }
   return h+`</tbody></table>`;
 }
