@@ -45,7 +45,7 @@
 <body>
 <header>
   <h1><span>Bolt</span> · Delivery Radius Impact — Baseline vs Current (B)</h1>
-  <div class="sub">Networks ANRI-PHARM &amp; TAISTRA · source: Databricks <code style="color:#cfe">main.ng_delivery</code> (delivered orders)</div>
+  <div class="sub">Networks ANRI-PHARM &amp; TAISTRA · volume/fees/CPO from <code style="color:#cfe">fact_order_delivery</code> · CP Margin from finance table <code style="color:#cfe">fact_provider_weekly</code></div>
 </header>
 <div class="wrap">
 
@@ -54,13 +54,13 @@
     <div class="pchip a"><b>A · 24–29.07.2026</b>First custom radii · 6 days</div>
     <div class="pchip b"><b>B · 30.07–30.08.2026 (current)</b>Wider radii (+20–40%) · 32 days</div>
   </div>
-  <div class="muted">Periods differ in length, so <b>volume &amp; GMV are shown per day</b>; AOV, distance, CPO and Eater fees are per-order averages; CP Margin is a share of GMV. The report focuses on <b>Baseline → B</b> (the net effect of moving to custom, then wider, radii). <b>CP Margin %</b> = contribution profit / GMV, where contribution profit = commission + service fee + small-order fee + delivery fee − courier cost (CPO) − refunds − incentives.</div>
+  <div class="muted">Periods differ in length, so <b>volume &amp; GMV are shown per day</b>; AOV, distance, CPO and Eater fees are per-order averages. The report focuses on <b>Baseline → B</b> (the net effect of moving to custom, then wider, radii). <b>CP Margin %</b> is now the <b>official finance figure</b> = <code>total_contribution_profit_eur / total_gmv_before_discounts_eur</code> from <code>fact_provider_weekly</code> — the same definition used in the <a href="https://mykhailobrynchak-dev.github.io/Stores-internal-weekly-report/" style="color:var(--primary-d)">3P Stores Weekly Report</a>. That table is <b>weekly-grained</b>, so CP Margin is measured on <b>complete weeks</b>: Baseline = weeks 05.05–20.07, B = weeks 04–31.08. Period A (24–29.07) is a partial week and has no clean weekly CP Margin, so it is shown as <code>n/a</code>.</div>
 
   <div class="callout good">
-    <b>Headline (Baseline → B).</b> Both networks improved unit economics: <b>CPO fell</b> (ANRI €2.59→€2.34, −10%; TAISTRA €2.24→€1.86, −17%), average client–store distance dropped, and <b>CP Margin % improved</b> markedly — ANRI <b>−23.4% → −15.3%</b> (+8.1 pp), TAISTRA <b>−9.2% → −3.3%</b> (+5.9 pp). ANRI also grew strongly in volume (+65% orders/day), while TAISTRA held volume flat at higher efficiency.
+    <b>Headline (Baseline → B).</b> Both networks improved unit economics: <b>CPO fell</b> (ANRI €2.59→€2.34, −10%; TAISTRA €2.24→€1.86, −17%), average client–store distance dropped, and the <b>official CP Margin % improved</b> — ANRI <b>−6.4% → −2.3%</b> (+4.1 pp), TAISTRA <b>−4.6% → +0.6%</b> (+5.2 pp, crossing into positive). CP&nbsp;L2 (excl. demand incentives) followed the same path: ANRI −16.2%→−8.5%, TAISTRA −6.9%→−1.8%. ANRI also grew strongly in volume (+65% orders/day), while TAISTRA held volume flat at higher efficiency.
   </div>
   <div class="callout warn">
-    <b>Caveats.</b> Baseline is a long ramp-up window (May–Jul) and B is August, so seasonality and organic growth are mixed in with the radius effect (esp. for the growing ANRI network). CP Margin is a transparent reconstruction (see formula above), not the official finance figure. Contribution margin is negative across the board — delivery is subsidised (courier cost + incentives exceed commission + fees).
+    <b>Caveats.</b> Baseline is a long ramp-up window (May–Jul) and B is August, so seasonality and organic growth are mixed in with the radius effect (esp. for the growing ANRI network). CP Margin is still slightly negative for ANRI (delivery partly subsidised — courier cost + incentives exceed commission + fees), but TAISTRA reached breakeven in August. The margin trend was already improving week-over-week before the radius change, so part of the gain is the ongoing ramp, not radius alone.
   </div>
 
   <h2>Network metrics by period</h2>
@@ -68,11 +68,11 @@
 
   <h2>CP Margin % &amp; correlation with CPO change</h2>
   <div class="callout info">
-    At network level, <b>lower CPO coincided with better CP Margin</b> from Baseline to B. At <b>store level</b> (n=<span id="ns"></span> stores with ≥15 delivered orders in both Baseline and B), the correlation between the change in CPO and the change in CP Margin % is
-    <span class="rbadge" id="rval"></span> (Pearson). It is <b>weakly negative</b> — stores whose CPO rose tended to see slightly weaker margin gains — but weak and noisy given the small sample and campaign-driven incentive swings.
+    Both CP Margin and CPO here come from the same official finance table (<code>fact_provider_weekly</code>), so the link is measured on a consistent basis. At <b>store level</b> (n=<span id="ns"></span> stores with ≥15 delivered orders in both Baseline and B weeks), the correlation between the change in <b>invoiced CPO</b> and the change in <b>CP Margin %</b> is
+    <span class="rbadge" id="rval"></span> (Pearson). It is <b>moderately negative</b> — stores whose CPO fell tended to gain more CP Margin, and the handful whose CPO rose (mostly Ternopil) lost margin. This is a clearer signal than the earlier reconstruction, though incentive/commission mix still adds noise.
   </div>
   <div class="chart">
-    <h3>Store-level: Δ CPO (€) vs Δ CP Margin (pp), Baseline → B</h3>
+    <h3>Store-level: Δ invoiced CPO (€) vs Δ CP Margin (pp), Baseline → B</h3>
     <div id="scatter"></div>
     <div class="legend"><span><i style="background:#34D186"></i>TAISTRA</span><span><i style="background:#3fa9ff"></i>ANRI-PHARM</span><span>· dashed lines = zero (no change)</span></div>
   </div>
@@ -84,9 +84,9 @@
   <h2>Takeaways</h2>
   <div class="callout info">
     <ul>
-      <li><b>The radius programme did not hurt unit economics</b> — from Baseline to current (B), CPO and delivery distance fell and CP Margin improved for both networks, while ANRI scaled volume.</li>
-      <li><b>CPO ↔ CP Margin link is weak at store level</b> (r=<span id="rval2"></span>): margin is dominated by incentives and commission mix, not just courier cost. Managing incentive spend matters as much as radius/CPO.</li>
-      <li><b>Watch-outs:</b> TAISTRA <b>Ternopil</b> CP Margin dropped (small sample, +radius) and TAISTRA late-rate ticked up — review locally. Contribution margin remains negative everywhere; improving commission/fees or trimming incentives is needed to reach breakeven.</li>
+      <li><b>The radius programme did not hurt unit economics</b> — from Baseline to current (B), CPO and delivery distance fell and the official CP Margin improved for both networks, while ANRI scaled volume. TAISTRA crossed into a positive CP Margin (+0.6%) in August.</li>
+      <li><b>CPO ↔ CP Margin link is moderately negative at store level</b> (r=<span id="rval2"></span>): lower courier cost is a real driver of margin, but incentives and commission mix still matter. Managing incentive spend matters alongside radius/CPO.</li>
+      <li><b>Watch-outs:</b> TAISTRA <b>Ternopil</b> is the one city where CP Margin fell (0.2%→−3.3%) and CPO did not improve — the wider radius there added cost without margin, so review its radii locally. TAISTRA late-rate also ticked up. ANRI is still slightly margin-negative overall — trimming incentives / lifting commission is the path to breakeven.</li>
       <li><b>For a clean read</b> free of seasonality/ramp, compare like-for-like calendar windows (e.g., Aug-2026 vs Aug-2025) once more history accrues.</li>
     </ul>
   </div>
@@ -114,8 +114,13 @@ const CITY=[
  ["TAISTRA","Khmelnytskyi",{d:723,g:8102.4,r:2.322,cpo:2.147,cm:-910.76,gm:8102.36},{d:374,g:4339.0,r:1.780,cpo:1.791,cm:-90.59,gm:4338.95}],
  ["TAISTRA","Ternopil",{d:110,g:1333.9,r:2.785,cpo:2.068,cm:-68.27,gm:1333.88},{d:96,g:845.7,r:2.322,cpo:1.908,cm:-244.94,gm:845.67}]
 ];
-const CORR=[{"pid":203432,"gn":"ANRI-PHARM","dCPO":0.153,"dCPM":3.8},{"pid":164283,"gn":"TAISTRA","dCPO":-0.32,"dCPM":11.5},{"pid":193395,"gn":"TAISTRA","dCPO":-0.384,"dCPM":13.3},{"pid":203459,"gn":"ANRI-PHARM","dCPO":-0.307,"dCPM":3.9},{"pid":153567,"gn":"TAISTRA","dCPO":-0.415,"dCPM":10.8},{"pid":164329,"gn":"TAISTRA","dCPO":-0.031,"dCPM":3.6},{"pid":198369,"gn":"TAISTRA","dCPO":-0.154,"dCPM":3.9},{"pid":199390,"gn":"TAISTRA","dCPO":-0.174,"dCPM":4.1},{"pid":203431,"gn":"ANRI-PHARM","dCPO":-0.129,"dCPM":1.8},{"pid":164340,"gn":"TAISTRA","dCPO":-0.458,"dCPM":-40.3},{"pid":203421,"gn":"ANRI-PHARM","dCPO":-0.054,"dCPM":2.8},{"pid":203426,"gn":"ANRI-PHARM","dCPO":0.112,"dCPM":8.3},{"pid":175229,"gn":"TAISTRA","dCPO":-0.328,"dCPM":6.7},{"pid":203429,"gn":"ANRI-PHARM","dCPO":0.055,"dCPM":-4.6},{"pid":164334,"gn":"TAISTRA","dCPO":-0.207,"dCPM":3.3},{"pid":203419,"gn":"ANRI-PHARM","dCPO":-0.224,"dCPM":16.3},{"pid":175689,"gn":"TAISTRA","dCPO":-0.099,"dCPM":9.4},{"pid":203396,"gn":"ANRI-PHARM","dCPO":-0.513,"dCPM":15.6},{"pid":198370,"gn":"TAISTRA","dCPO":0.44,"dCPM":-7.9},{"pid":164337,"gn":"TAISTRA","dCPO":-0.41,"dCPM":8.6},{"pid":174008,"gn":"TAISTRA","dCPO":0.113,"dCPM":-0.6},{"pid":203395,"gn":"ANRI-PHARM","dCPO":-0.144,"dCPM":4.7}];
-const R_VAL=-0.13;
+// Official CP Margin % (fact_provider_weekly): contribution profit / GMV before discounts. A = partial week -> n/a.
+const CPMOFF={"ANRI-PHARM":{BASE:-6.4,A:null,B:-2.3},"TAISTRA":{BASE:-4.6,A:null,B:0.6}};
+// Official CP Margin % per city (BASE weeks vs B weeks)
+const CITYCPM={"ANRI-PHARM|Kyiv":{b:-5.3,bb:-1.3},"ANRI-PHARM|Lviv":{b:-12.7,bb:-6.1},"TAISTRA|Chernivtsi":{b:-6.0,bb:1.3},"TAISTRA|Ivano-Frankivsk":{b:-1.5,bb:1.2},"TAISTRA|Khmelnytskyi":{b:-3.6,bb:0.3},"TAISTRA|Ternopil":{b:0.2,bb:-3.3}};
+// Store-level: Δ invoiced CPO vs Δ CP Margin (official), Baseline weeks -> B weeks
+const CORR=[{"pid":164337,"gn":"TAISTRA","dCPO":-0.369,"dCPM":3.4},{"pid":164340,"gn":"TAISTRA","dCPO":-0.273,"dCPM":-2.1},{"pid":164283,"gn":"TAISTRA","dCPO":-0.411,"dCPM":7.8},{"pid":199390,"gn":"TAISTRA","dCPO":-0.175,"dCPM":3.8},{"pid":164329,"gn":"TAISTRA","dCPO":-0.046,"dCPM":0.9},{"pid":203426,"gn":"ANRI-PHARM","dCPO":-0.028,"dCPM":5.9},{"pid":175229,"gn":"TAISTRA","dCPO":-0.393,"dCPM":5.1},{"pid":174008,"gn":"TAISTRA","dCPO":0.048,"dCPM":3.9},{"pid":175689,"gn":"TAISTRA","dCPO":-0.209,"dCPM":4.0},{"pid":198370,"gn":"TAISTRA","dCPO":0.471,"dCPM":-7.0},{"pid":164334,"gn":"TAISTRA","dCPO":-0.167,"dCPM":1.9},{"pid":203459,"gn":"ANRI-PHARM","dCPO":-0.593,"dCPM":4.7},{"pid":193395,"gn":"TAISTRA","dCPO":-0.398,"dCPM":5.6},{"pid":198369,"gn":"TAISTRA","dCPO":-0.142,"dCPM":2.4},{"pid":203421,"gn":"ANRI-PHARM","dCPO":-0.332,"dCPM":3.8},{"pid":203396,"gn":"ANRI-PHARM","dCPO":-0.736,"dCPM":1.3},{"pid":153567,"gn":"TAISTRA","dCPO":-0.507,"dCPM":9.0},{"pid":203432,"gn":"ANRI-PHARM","dCPO":-0.129,"dCPM":2.8}];
+const R_VAL=-0.58;
 
 const pct=(a,b)=>(b===0)?null:(a-b)/b*100;
 const dtxt=v=>v===null?'n/a':(v>0?'+':'')+v.toFixed(0)+'%';
@@ -141,13 +146,13 @@ function cellVal(net,per,r){
   const d=NET[net][per];
   if(r.mode==="perday")return `${r.f(d[r.k]/DAYS[per])}<span class="m">/d</span>`;
   if(r.mode==="rate")return (d.late/d.delivered*100).toFixed(0)+'%';
-  if(r.mode==="cpm"){const v=cpm(d);return v.toFixed(1)+'%';}
+  if(r.mode==="cpm"){const v=CPMOFF[net][per];return v===null?'<span class="m">n/a</span>':(v>0?'+':'')+v.toFixed(1)+'%';}
   return r.f(d[r.k]);
 }
 function deltaBvsBase(net,r){
   const A=NET[net].B, Bx=NET[net].BASE;
   if(r.mode==="rate"){const dd=A.late/A.delivered*100 - Bx.late/Bx.delivered*100;return `<span class="${cls(dd,r.good)}">${(dd>0?'+':'')+dd.toFixed(0)} pp</span>`;}
-  if(r.mode==="cpm"){const dd=cpm(A)-cpm(Bx);return `<span class="${cls(dd,r.good)}">${(dd>0?'+':'')+dd.toFixed(1)} pp</span>`;}
+  if(r.mode==="cpm"){const dd=CPMOFF[net].B-CPMOFF[net].BASE;return `<span class="${cls(dd,r.good)}">${(dd>0?'+':'')+dd.toFixed(1)} pp</span>`;}
   let a=A[r.k],b=Bx[r.k];
   if(r.mode==="perday"){a/=DAYS.B;b/=DAYS.BASE;}
   const p=pct(a,b);return `<span class="${cls(p,r.good)}">${dtxt(p)}</span>`;
@@ -186,7 +191,7 @@ function cityTable(){
   for(const [net,city,BA,B] of CITY){
     const dpb=BA.d/DAYS.BASE,dpB=B.d/DAYS.B,gpb=BA.g/DAYS.BASE,gpB=B.g/DAYS.B;
     const pd=pct(dpB,dpb),pg=pct(gpB,gpb);
-    const cmb=100*BA.cm/BA.gm,cmB=100*B.cm/B.gm;
+    const cc=CITYCPM[net+'|'+city]||{b:null,bb:null};const cmb=cc.b,cmB=cc.bb;
     h+=`<tr><td>${net}</td><td>${city}</td><td>${dpb.toFixed(1)}</td><td class="hl">${dpB.toFixed(1)}</td><td class="${cls(pd,1)}">${dtxt(pd)}</td>
       <td>${gpb.toFixed(0)}</td><td class="hl">${gpB.toFixed(0)}</td><td class="${cls(pg,1)}">${dtxt(pg)}</td>
       <td>${BA.cpo.toFixed(2)}</td><td class="hl">${B.cpo.toFixed(2)}</td>
