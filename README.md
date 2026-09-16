@@ -25,6 +25,16 @@ Tabs:
 All tables are filterable (date, |difference|, issues only), sortable, and paginated 50 rows at a time.
 Rows highlighted in red were not matched / cancelled / failed in Bolt while present at the partner.
 
+## OKKO Cafe — cancellations & refunds
+
+**Live:** https://mykhailobrynchak-dev.github.io/stores-projects/okko-cafe-cancellations.html
+
+Internal 90-day baseline for **OKKO CAFE GROUP** (gas-station cafes that go
+offline during air-raid alerts). Covers cancel rate and reasons, customer /
+OKKO (supply) / Bolt (demand) refunds, fail stage (before accept vs after
+courier/pickup), city and store breakdown, hour-of-day. Databricks has no
+air-raid label — merchant-side fail reasons are used as a proxy.
+
 ## Custom Delivery Polygons — Radius Analysis
 
 **Live:** https://mykhailobrynchak-dev.github.io/stores-projects/custom-polygons/
