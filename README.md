@@ -14,59 +14,13 @@ Tabs:
 - **Hop Hey** — two periods as sub-tabs: **01.05–14.06** and **01.07–12.07.2026**.
   Matched by the unique 9-digit `order_id`; Sum difference = Hop Hey price − `provider_price_before_discount`
   (Bolt price shown before and after discount).
-- **Kopiyka** — two periods as sub-tabs: **01.05–14.06** and **01.06–12.07.2026**.
+- **Kopiyka** — three periods as sub-tabs: **01.05–14.06**, **01.06–12.07**, and **01.07–31.08.2026**.
   Matched by `order_id`; Sum difference = Bolt receipt (after discount) − Kopiyka receipt.
-- **TAISTRA** (01.05–09.07.2026) — the partner registry has no shared order IDs, only
-  location + timestamp + amount, so receipts are matched to Bolt orders by
-  **location + timestamp (±120 min) + amount**. Each row shows the match type
-  (Exact sum / Time-matched / Not matched). Includes a per-location summary of matched totals.
-  The registry includes only bank-transfer receipts and excludes the ОʼНДЕ store.
+- **TAISTRA**
+  - **01.05–09.07.2026** — no shared order IDs; receipts matched by location + timestamp (±120 min) + amount.
+  - **July 2026** and **August 2026** — partner files contain **location totals only**.
+    Compared with Bolt `provider_price_after_discount` for **all delivered** orders at the matching store
+    (cash + cashless; ОʼНДЕ excluded). Partner file is labelled cashless-only, but those totals align with all delivered, not cashless-only.
 
 All tables are filterable (date, |difference|, issues only), sortable, and paginated 50 rows at a time.
 Rows highlighted in red were not matched / cancelled / failed in Bolt while present at the partner.
-
-## OKKO Cafe — cancellations & refunds
-
-**Live:** https://mykhailobrynchak-dev.github.io/stores-projects/okko-cafe-cancellations.html
-
-Internal 90-day baseline for **OKKO CAFE GROUP** (gas-station cafes that go
-offline during air-raid alerts). Covers cancel rate and reasons, customer /
-OKKO (supply) / Bolt (demand) refunds, fail stage (before accept vs after
-courier/pickup), city and store breakdown, hour-of-day. Databricks has no
-air-raid label — merchant-side fail reasons are used as a proxy.
-
-## Custom Delivery Polygons — Radius Analysis
-
-**Live:** https://mykhailobrynchak-dev.github.io/stores-projects/custom-polygons/
-
-Coverage analysis and delivery-radius optimization for partner networks
-(**FORA**, **ANRI-PHARM**, **TAISTRA**). Each network has two interactive maps:
-
-- **Radius Map (Delivery Radius Optimizer)** — compare three radius strategies
-  (city-uniform / per-store / country) with live coverage, cannibalization and CPO.
-- **Manual Radius Editor** — drag each store's radius and export the result to CSV.
-
-Key points of the methodology:
-
-- **Coverage is measured over the official Bolt delivery zones** (KML polygons), not
-  residential area — so numbers reflect the real serviceable territory.
-- **Economics from Databricks:** store coordinates from `dim_provider_v2`, per-city
-  drop-off distance and CPO (courier earning + bonus + waiting) from `fact_order_delivery`.
-- **Recommended strategy** is highlighted on each map. For the sparse TAISTRA network the
-  recommendation is a **resilient** radius: sized so ≥85% of demand is reachable by 2+
-  stores, giving a backup if a store goes offline — at ~the same CPO.
-
-Folder [`custom-polygons/`](custom-polygons/):
-
-- `*-radius-map.html`, `*-manual-editor.html` — the shareable maps per network.
-- `final-radii/` — the **final applied radii per store** (with Provider ID) for FORA,
-  ANRI-PHARM and TAISTRA.
-- [`radius-impact-report.html`](https://mykhailobrynchak-dev.github.io/stores-projects/custom-polygons/radius-impact-report.html)
-  — **impact analysis** of the radius changes on ANRI-PHARM and TAISTRA across three
-  periods — **Baseline (01.05–23.07, before changes)**, **A (24–29.07)** and the current
-  wider **B (30.07–30.08)** — focused on Baseline → B. Covers orders, GMV, CPO, client↔store
-  distance, Eater fees (Service / Small Order / Delivery), delivery time, late-rate and
-  **CP Margin %**, plus the store-level **correlation between ΔCPO and ΔCP Margin**, by
-  network and city (English).
-- `sources/` — the reproducible pipeline (`_pipeline/`: fetch data & Bolt zones, build,
-  render) plus per-network inputs/outputs (`stores.json`, `econ.json`, Bolt zones, etc.).
