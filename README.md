@@ -25,6 +25,10 @@ Tabs:
   Window **01.07–31.08.2026** (EUROSPAR), plus two partner rows dated **30.09**.
   Sum difference = Bolt receipt (after discount) − SPAR receipt.
   Failed/rejected Bolt orders in Jul–Aug are listed for context; they are not treated as issues.
+- **ROST** — **September 2026** registry, matched by Corezoid number (`order_id`) with `order_reference_id` as fallback.
+  Sum difference = Bolt receipt (after discount) − ROST document sum.
+  **Bag compensation** is a second sub-tab with the partner’s package-compensation orders only;
+  net difference = Σ (Bolt − ROST) on those orders.
 
 All tables are filterable (date, |difference|, issues only), sortable, and paginated 50 rows at a time.
 Rows highlighted in red were not matched / cancelled / failed in Bolt while present at the partner.
